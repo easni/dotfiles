@@ -14,8 +14,15 @@ workspace_icon() {
     esac
 }
 ICON=$(workspace_icon "$1")
+
+if [ "$SENDER" = "aerospace_workspace_change" ] &&
+    [ "$1" != "$FOCUSED_WORKSPACE" ] &&
+    [ "$1" != "$PREV_WORKSPACE" ]; then
+    exit 0
+fi
+
 if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
-    sketchybar --set $NAME icon=$ICON label.color=0xffcba6f7 icon.color=0xffcba6f7
+    sketchybar --set "$NAME" icon="$ICON" label.color=0xffcba6f7 icon.color=0xffcba6f7
 else
-    sketchybar --set $NAME icon=$ICON label.color=0xffffffff icon.color=0xffffffff
+    sketchybar --set "$NAME" icon="$ICON" label.color=0xffffffff icon.color=0xffffffff
 fi

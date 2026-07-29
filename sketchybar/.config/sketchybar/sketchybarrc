@@ -72,6 +72,7 @@ sketchybar --add item time right \
     label.align=center \
     background.drawing=off \
     y_offset=-4
+
 # Spacer
 sketchybar --add item spacer_right right \
     --set spacer_right \
@@ -79,6 +80,7 @@ sketchybar --add item spacer_right right \
     background.drawing=off \
     label.drawing=off \
     icon.drawing=off
+
 # Battery
 sketchybar --add item volume right \
     --set volume \
@@ -170,22 +172,20 @@ for sid in 1 2 3 4 5 6; do
         script="$PLUGIN_DIR/aerospace.sh $sid"
 done
 
-for mid in $(aerospace list-monitors | cut -c1); do
-    for sid in $(aerospace list-workspaces --monitor $mid --empty no); do
-        apps=$(aerospace list-windows --workspace "$sid" | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
+for sid in 1 2 3 4 5 6; do
+    apps=$(aerospace list-windows --workspace "$sid" | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
 
-        sketchybar --set space.$sid drawing=on
+    sketchybar --set space.$sid drawing=on
 
-        icon_strip=" "
-        if [ "${apps}" != "" ]; then
-            while read -r app; do
-                icon_strip+=" $($PLUGIN_DIR/icon_map_fn.sh "$app")"
-            done <<<"${apps}"
-        else
-            icon_strip=""
-        fi
-        sketchybar --set space.$sid label="$icon_strip"
-    done
+    icon_strip=" "
+    if [ "${apps}" != "" ]; then
+        while read -r app; do
+            icon_strip+=" $($PLUGIN_DIR/icon_map_fn.sh "$app")"
+        done <<<"${apps}"
+    else
+        icon_strip=""
+    fi
+    sketchybar --set space.$sid label="$icon_strip"
 done
 
 sketchybar --add item icon_refresher left \

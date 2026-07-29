@@ -20,11 +20,11 @@ setopt hist_expire_dups_first
 setopt hist_ignore_dups
 setopt hist_verify
 
-bindkey '^[[A' history-search-backward
-bindkey '^[[B' history-search-forward
+# bindkey '^[[A' history-search-backward
+# bindkey '^[[B' history-search-forward
 
-# bindkey '^p' history-search-backward
-# bindkey '^n' history-search-forward
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
 
 alias ls="eza --icons=always"
 
