@@ -1,1 +1,4 @@
 /tmux/.config/tmux/plugins
+*.png
+*.jpg
+*.jpeg
