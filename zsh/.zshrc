@@ -30,6 +30,10 @@ export GOOGLE_CLOUD_PROJECT="fabric-443000"
 # bindkey -s ^t "~/tmux-sessionizer.sh\n"
 alias t="~/.config/scripts/tmux-sessionizer.sh"
 
+# custom syncing script alias
+alias syncpush="~/.config/scripts/sync-push.sh"
+alias syncpull="~/.config/scripts/sync-pull.sh"
+
 alias larp="fastfetch"
 
 
