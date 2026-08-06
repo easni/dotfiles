@@ -3,22 +3,54 @@
 NOTES_DIR="$HOME/Documents/Notes"
 OPEN_NOTES_ON_EXISTING_SESSION="false"
 
+# Machine / OS-specific paths
+case "$(uname -s)" in
+  Darwin)
+    # macOS
+    DIRECT_PATHS=(
+      "$HOME/dotfiles"
+    )
+
+    SEARCH_ROOTS=(
+      "$HOME/Documents"
+      "$HOME/Documents/Coding"
+      "$HOME/Documents/research projects"
+      "$HOME/Documents/Summer 2026 MGH Intership"
+    )
+    ;;
+
+  Linux)
+    # Linux
+    DIRECT_PATHS=(
+      "$HOME/dotfiles"
+    )
+
+    SEARCH_ROOTS=(
+      "$HOME/Documents"
+    )
+    ;;
+
+  *)
+    echo "Unsupported OS: $(uname -s)" >&2
+    exit 1
+    ;;
+esac
+
 if [[ $# -eq 1 ]]; then
   selected=$1
 else
   selected=$(
     {
-      echo "$HOME/dotfiles"
+      # Explicit/direct paths
+      printf '%s\n' "${DIRECT_PATHS[@]}"
 
-      find "$HOME/" \
-        -mindepth 1 -maxdepth 1 -type d
+      # One level of directories under each search root
+      for root in "${SEARCH_ROOTS[@]}"; do
+        [[ -d "$root" ]] || continue
+        find "$root" -mindepth 1 -maxdepth 1 -type d
+      done
     } | fzf
   )
-fi
-
-# If nothing selected
-if [[ -z $selected ]]; then
-  exit 0
 fi
 
 # Make a safe tmux session name
@@ -42,7 +74,7 @@ if [[ "$selected" == "$NOTES_DIR" ]]; then
   cmd="selection=\$(find . -type f -name '*.md' | sed 's|^\./||; s/\.md$//' | fzf --bind 'ctrl-y:print-query' --print-query --header 'Select or Type New Note Path | Ctrl-y: Create New' | tail -1) && \
          if [[ -n \"\$selection\" ]]; then \
             mkdir -p \"\$(dirname \"\$selection\")\" && \
-            vim \"\$selection.md\"; \
+            nvim \"\$selection.md\"; \
          fi"
 
   # Check if the session is "busy" (running nvim, fzf, or something else)
