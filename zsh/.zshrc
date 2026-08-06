@@ -3,16 +3,10 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell" # set by `omz`
 plugins=(
   # git
-  zsh-autosuggestions
   zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
-
-# export PATH="/opt/homebrew/anaconda3/bin:$PATH"  # commented out by conda initialize
-
-# For zoxide
-eval "$(zoxide init --cmd cd zsh)"
 
 # History
 # setopt share_history
@@ -28,23 +22,6 @@ bindkey '^n' history-search-forward
 
 alias ls="eza --icons=always"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-conda() {
-  __conda_setup="$('/opt/homebrew/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-  if [ $? -eq 0 ]; then
-      eval "$__conda_setup"
-  else
-      if [ -f "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" ]; then
-          . "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"
-      else
-          export PATH="/opt/homebrew/anaconda3/bin:$PATH"
-      fi
-  fi
-  unset __conda_setup
-}
-# <<< conda initialize <<<
-
 # google cloud project key for gemini-cli
 export GOOGLE_CLOUD_PROJECT="fabric-443000"
 
@@ -53,19 +30,23 @@ export GOOGLE_CLOUD_PROJECT="fabric-443000"
 # bindkey -s ^t "~/tmux-sessionizer.sh\n"
 alias t="~/.config/scripts/tmux-sessionizer.sh"
 
-alias lvim='NVIM_APPNAME=nvim-lazy nvim'
-alias cvim='NVIM_APPNAME=nvim-custom nvim'
-alias kvim='NVIM_APPNAME=nvim-kickstart nvim'
+# custom syncing script alias
+alias syncpush="~/.config/scripts/sync-push.sh"
+alias syncpull="~/.config/scripts/sync-pull.sh"
 
-alias vim='NVIM_APPNAME=nvim-kickstart nvim'
+alias larp="fastfetch"
+
 
 # Autocomplete for jj
 autoload -U compinit
 compinit
 source <(jj util completion zsh)
 
+# auto suggestions
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 # Open buffer line in editor
-export VISUAL=vim
+export VISUAL=nvim
 export EDITOR="$VISUAL"
 
 # Edit prompt in editor
@@ -76,3 +57,24 @@ bindkey '^x^e' edit-command-line
 
 # Fix ssh terminal stuff acting weird for Ghostty
 alias ssh="env TERM=xterm-256color ssh"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+conda() {
+    __conda_setup="$('/home/easonni/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home/easonni/miniconda3/etc/profile.d/conda.sh" ]; then
+            . "/home/easonni/miniconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/easonni/miniconda3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+}
+
+# >>> Codex installer >>>
+export PATH="/home/easonni/.local/bin:$PATH"
+# <<< Codex installer <<<

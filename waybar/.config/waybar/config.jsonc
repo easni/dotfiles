@@ -1,0 +1,147 @@
+{
+  "layer": "top",
+    "position": "top",
+    "exclusive": true,
+    "modules-left": [
+      "hyprland/workspaces",
+
+    ],
+    "modules-center": [
+      "hyprland/window"
+    ],
+    "modules-right": [
+      "tray",
+      "network",
+      "bluetooth",
+      "pulseaudio",
+      "battery",
+      "cpu",
+      "memory",
+      "disk",
+      "clock"
+    ],
+    "reload_style_on_change": true,
+
+    "hyprland/window": {
+      "format": "{class}  {title}",
+      "icon": false,
+      "max-length": 50,
+      "separate-outputs": true,
+      "tooltip": false
+    },
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "tooltip": false,
+      "all-outputs": false,
+      "sort-by-number": true,
+      "disable-scroll": false,
+      "on-scroll-up": "hyprctl dispatch workspace +1",
+      "on-scroll-down": "hyprctl dispatch workspace -1",
+      "active-only": false,
+      "show-special": false,
+    },
+
+    "tray": {
+      "format": "{icon}",
+      "tooltip": true,
+      "icon-size": 18,
+      "spacing": 0
+    },
+    "network": {
+      "format-wifi": "  {essid} {signalStrength}%",
+      "format-ethernet": "  {ifname}",
+      "format-linked": "  {ifname}",
+      "format-disconnected": "  offline",
+      "tooltip-format": "{ifname}: {ipaddr}/{cidr}\nGateway: {gwaddr}",
+      "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
+      "on-click": "nm-connection-editor"
+    },
+    "bluetooth": {
+      "format": " {status}",
+      "format-disabled": " off",
+      "format-off": " off",
+      "format-no-controller": "",
+      "format-connected": " {device_alias}",
+      "format-connected-battery": " {device_alias} {device_battery_percentage}%",
+      "tooltip-format": "Bluetooth: {status}",
+      "tooltip-format-connected": "{num_connections} connected\n\n{device_enumerate}",
+      "tooltip-format-enumerate-connected": "{device_alias}",
+      "tooltip-format-enumerate-connected-battery": "{device_alias}: {device_battery_percentage}%",
+      "max-length": 30,
+      "on-click": "sh -c 'command -v blueman-manager >/dev/null && exec blueman-manager || notify-send \"Bluetooth manager not installed\" \"Install it with: sudo pacman -S blueman\"'"
+    },
+    "pulseaudio": {
+      "format": "{icon} {volume}%",
+      "format-muted": "󰝟",
+      "tooltip": true,
+      "tooltip-format": "{desc}: {volume}%",
+      "format-icons": {
+        "headphone": "",
+        "default": [
+          "",
+        "",
+        ""
+        ],
+      },
+      "scroll-step": 5,
+      "on-click": "pavucontrol",
+      "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+    "battery": {
+      "interval": 60,
+      "states": {
+        "warning": 15,
+        "critical": 5
+      },
+      "events": {
+        "on-discharging-warning": "notify-send -u normal 'Low Battery'",
+        "on-discharging-critical": "notify-send -u critical 'Very Low Battery'",
+        "on-charging-100": "notify-send -u normal 'Battery Full!'"
+      },
+      "format": "{icon} {capacity}%",
+      "format-charging": "󰋴 {capacity}%",
+      "format-plugged": "󰋴 {capacity}%",
+      "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+      "max-length": 25
+    },
+    "cpu": {
+      "format": "cpu: {usage}%",
+      "tooltip": true,
+      "interval": 4
+    },
+    "memory": {
+      "format": "mem: {used:0.1f}G",
+      "tooltip": true,
+      "tooltip-format": "RAM: {used:0.1f}G used / {total:0.1f}G total",
+      "interval": 4,
+    },
+    "disk": {
+      "interval": 30,
+      "unit": "GB",
+      "format": "disk: {specific_used:0.2f}G",
+      "path": "/",
+      "tooltip": true,
+      "tooltip-format": "Root: Used {specific_used:0.2f}G / free {specific_free:0.2f}G",
+    },
+
+    "clock": {
+      "format": "{:%H:%M}",
+      "format-alt": "{:%A, %B %d, %Y (%R)} 󰃰 ",
+      "tooltip-format": "<tt><small>{calendar}</small></tt>",
+      "calendar": {
+        "mode"             : "year",
+        "mode-mon-col"     : 3,
+        "weeks-pos"        : "right",
+        "first-day-of-week": 1,
+        "on-scroll"        : 1,
+        "on-click-right"   : "mode",
+        "format": {
+          "months":     "<span color='#ffead3'><b>{}</b></span>",
+          "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+          "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+          "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+          "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
+        }
+      },
+    }
+}

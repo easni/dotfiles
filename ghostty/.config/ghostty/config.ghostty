@@ -1,5 +1,7 @@
 # RELOAD configuration with cmd + shift + ,
 
+font-family = JetBrainsMono Nerd Font
+
 palette = 0=#214969
 palette = 1=#E52E2E
 palette = 2=#44FFB1
@@ -14,13 +16,12 @@ foreground =#CBE0F0
 cursor-color =#ffffff
 
 # minimum-contrast = 1
-font-size = 18
+font-size = 16
 
 background-opacity = 0.85
-background-blur-radius = 20
 
-# custom-shader = shaders/cursor_shaders/cursor_tail.glsl
-# custom-shader-animation = always
+custom-shader = shaders/cursor_shaders/cursor_tail.glsl
+custom-shader-animation = always
 
 mouse-hide-while-typing = true
 
