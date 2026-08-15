@@ -73,3 +73,8 @@ printf '%s\n' "$pulled_commit" > "$state_tmp"
 mv -- "$state_tmp" "$SYNC_STATE_FILE"
 
 printf 'Replaced %s with %s (%s).\n' "$SYNC_DIR" "$SYNC_REMOTE" "$SYNC_BRANCH"
+if [[ -n "${backup_file:-}" ]]; then
+  printf 'Saved backup to %s.\n' "$backup_file"
+  printf 'Restore it with: syncrewind restore -p %q\n' "$backup_file"
+  printf 'Run syncrewind list to see all available backups.\n'
+fi

@@ -13,6 +13,7 @@ SYNC_BRANCH="${SYNC_BRANCH:-main}"
 SYNC_KEY_FILE="${SYNC_KEY_FILE:-$HOME/.config/folder-sync/key.txt}"
 SYNC_STATE_FILE="${SYNC_STATE_FILE:-$HOME/.local/state/folder-sync/last-remote-commit}"
 SYNC_FORCE="${SYNC_FORCE:-0}"
+IGNORE_LOCK_FILES="${IGNORE_LOCK_FILES:-0}"
 
 die() {
   printf 'sync-push: %s\n' "$*" >&2
@@ -27,6 +28,29 @@ command -v age >/dev/null 2>&1 || die "age 1.3.1 or newer is required"
 [[ ! -e "$SYNC_DIR/.git" ]] || die "refusing to snapshot a Git working tree: $SYNC_DIR"
 [[ -r "$SYNC_KEY_FILE" && -f "$SYNC_KEY_FILE" ]] || die "key file is missing or unreadable: $SYNC_KEY_FILE"
 [[ "$SYNC_FORCE" == "0" || "$SYNC_FORCE" == "1" ]] || die "SYNC_FORCE must be 0 or 1"
+[[ "$IGNORE_LOCK_FILES" == "0" || "$IGNORE_LOCK_FILES" == "1" ]] || die "IGNORE_LOCK_FILES must be 0 or 1"
+
+lock_files=()
+while IFS= read -r -d '' lock_file; do
+  lock_files+=("$lock_file")
+done < <(find "$SYNC_DIR" -type f \( \
+  -name '~$*' -o \
+  -name '.~lock.*#' -o \
+  -name '.#*' -o \
+  -name '#*#' -o \
+  -name '*.swp' -o \
+  -name '*.swo' -o \
+  -name '*.lock' -o \
+  -name '.lock' \
+\) -print0)
+
+if (( ${#lock_files[@]} > 0 )) && [[ "$IGNORE_LOCK_FILES" != "1" ]]; then
+  printf 'sync-push: lock or temporary files found:\n' >&2
+  for lock_file in "${lock_files[@]}"; do
+    printf '  %s\n' "${lock_file#"$SYNC_DIR"/}" >&2
+  done
+  die "close the related applications, or use IGNORE_LOCK_FILES=1 syncpush to omit these files"
+fi
 
 remote_ref="refs/heads/$SYNC_BRANCH"
 remote_line=$(git ls-remote "$SYNC_REMOTE" "$remote_ref") || die "could not read remote branch"
@@ -45,7 +69,20 @@ trap 'rm -rf -- "$temporary_dir"' EXIT
 # Build an encrypted archive in a temporary repository, leaving the synced
 # folder clean and hiding both its contents and filenames from the remote.
 mkdir -p -- "$temporary_dir/repository"
-tar --no-xattrs -czf - -C "$SYNC_DIR" . | \
+tar_options=(--no-xattrs)
+if [[ "$IGNORE_LOCK_FILES" == "1" ]]; then
+  tar_options+=(
+    '--exclude=~$*'
+    '--exclude=.~lock.*#'
+    '--exclude=.#*'
+    '--exclude=#*#'
+    '--exclude=*.swp'
+    '--exclude=*.swo'
+    '--exclude=*.lock'
+    '--exclude=.lock'
+  )
+fi
+tar "${tar_options[@]}" -czf - -C "$SYNC_DIR" . | \
   age --encrypt -i "$SYNC_KEY_FILE" \
     -o "$temporary_dir/repository/snapshot.tar.gz.age"
 cd "$temporary_dir/repository"
