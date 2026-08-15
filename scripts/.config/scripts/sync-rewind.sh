@@ -38,9 +38,17 @@ fi
 
 if [[ "$1" == "list" && $# == 1 ]]; then
   load_backups
+  printf '%-4s  %-23s  %s\n' '#' 'CREATED' 'BACKUP'
   backup_number=1
   for (( backup_index=${#backups[@]} - 1; backup_index >= 0; backup_index-- )); do
-    printf '%d  %s\n' "$backup_number" "${backups[backup_index]}"
+    backup_path=${backups[backup_index]}
+    backup_name=${backup_path##*/}
+    if [[ "$backup_name" =~ ^backup-([0-9]{4})([0-9]{2})([0-9]{2})T([0-9]{2})([0-9]{2})([0-9]{2})Z- ]]; then
+      created_at="${BASH_REMATCH[1]}-${BASH_REMATCH[2]}-${BASH_REMATCH[3]} ${BASH_REMATCH[4]}:${BASH_REMATCH[5]}:${BASH_REMATCH[6]} UTC"
+    else
+      created_at='Unknown'
+    fi
+    printf '%-4d  %-23s  %s\n' "$backup_number" "$created_at" "$backup_path"
     (( backup_number++ ))
   done
   exit 0
