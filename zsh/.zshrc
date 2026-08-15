@@ -33,6 +33,7 @@ alias t="~/.config/scripts/tmux-sessionizer.sh"
 # custom syncing script alias
 alias syncpush="~/.config/scripts/sync-push.sh"
 alias syncpull="~/.config/scripts/sync-pull.sh"
+alias syncrewind="~/.config/scripts/sync-rewind.sh"
 
 alias larp="fastfetch"
 

@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Prevent macOS archive tools from creating AppleDouble (._*) sidecar files.
+export COPYFILE_DISABLE=1
+
 # Override either value for a one-off invocation, for example:
 # SYNC_DIR="$HOME/other-folder" sync-pull.sh
 SYNC_DIR="${SYNC_DIR:-$HOME/Documents/sync}"
@@ -70,3 +73,8 @@ printf '%s\n' "$pulled_commit" > "$state_tmp"
 mv -- "$state_tmp" "$SYNC_STATE_FILE"
 
 printf 'Replaced %s with %s (%s).\n' "$SYNC_DIR" "$SYNC_REMOTE" "$SYNC_BRANCH"
+if [[ -n "${backup_file:-}" ]]; then
+  printf 'Saved backup to %s.\n' "$backup_file"
+  printf 'Restore it with: syncrewind restore -p %q\n' "$backup_file"
+  printf 'Run syncrewind list to see all available backups.\n'
+fi
