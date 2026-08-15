@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Prevent macOS archive tools from creating AppleDouble (._*) sidecar files.
+export COPYFILE_DISABLE=1
+
 # Override either value for a one-off invocation, for example:
 # SYNC_DIR="$HOME/other-folder" sync-push.sh
 SYNC_DIR="${SYNC_DIR:-$HOME/Documents/sync}"
@@ -42,7 +45,7 @@ trap 'rm -rf -- "$temporary_dir"' EXIT
 # Build an encrypted archive in a temporary repository, leaving the synced
 # folder clean and hiding both its contents and filenames from the remote.
 mkdir -p -- "$temporary_dir/repository"
-tar -czf - -C "$SYNC_DIR" . | \
+tar --no-xattrs -czf - -C "$SYNC_DIR" . | \
   age --encrypt -i "$SYNC_KEY_FILE" \
     -o "$temporary_dir/repository/snapshot.tar.gz.age"
 cd "$temporary_dir/repository"
