@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Prevent macOS archive tools from creating AppleDouble (._*) sidecar files.
+export COPYFILE_DISABLE=1
+
 # Override either value for a one-off invocation, for example:
 # SYNC_DIR="$HOME/other-folder" sync-pull.sh
 SYNC_DIR="${SYNC_DIR:-$HOME/Documents/sync}"

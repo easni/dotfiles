@@ -92,7 +92,7 @@ do
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
-  require('vim._core.ui2').enable() -- enable core ui 2
+  -- require('vim._core.ui2').enable() -- enable core ui 2
 
   -- Set <space> as the leader key
   -- See `:help mapleader`
