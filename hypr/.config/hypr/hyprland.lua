@@ -43,9 +43,10 @@ local menu = "hyprlauncher"
 -- Or execute your favorite apps at launch like this:
 --
 hl.on("hyprland.start", function () 
-  hl.exec_cmd("hyprpaper")
-  hl.exec_cmd("dunst")
-  hl.exec_cmd("waybar")
+    hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("dunst")
+    hl.exec_cmd("waybar")
+    -- hl.exec_cmd("hypridle")
 end)
 
 
@@ -268,11 +269,26 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+
+
+-- Lock, keep everything running
+hl.bind(
+    mainMod .. " + CTRL + L",
+    hl.dsp.exec_cmd("pidof hyprlock >/dev/null || hyprlock")
+)
+
+-- Lock + sleep computer, keep everything running
+hl.bind(
+    mainMod .. " + CTRL + SHIFT + L",
+    hl.dsp.exec_cmd("sh -c 'pidof hyprlock >/dev/null || hyprlock & sleep 1; systemctl suspend'")
+)
+
+-- Actually log out and return to SDDM
+hl.bind(mainMod .. " + CTRL + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 
 -- Only for dwindle?
 hl.bind(mainMod .. " + slash", hl.dsp.layout("togglesplit"))    -- dwindle only
