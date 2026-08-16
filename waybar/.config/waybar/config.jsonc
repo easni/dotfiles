@@ -4,10 +4,10 @@
     "exclusive": true,
     "modules-left": [
       "hyprland/workspaces",
-
+      "hyprland/window"
     ],
     "modules-center": [
-      "hyprland/window"
+      "clock"
     ],
     "modules-right": [
       "tray",
@@ -18,7 +18,6 @@
       "cpu",
       "memory",
       "disk",
-      "clock"
     ],
     "reload_style_on_change": true,
 
@@ -48,7 +47,7 @@
       "spacing": 0
     },
     "network": {
-      "format-wifi": "  {essid} {signalStrength}%",
+      "format-wifi": "  {essid}",
       "format-ethernet": "  {ifname}",
       "format-linked": "  {ifname}",
       "format-disconnected": "  offline",
