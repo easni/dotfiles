@@ -47,6 +47,7 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("dunst")
     hl.exec_cmd("waybar")
     -- hl.exec_cmd("hypridle")
+    hl.exec_cmd("fcitx5 -d")
 end)
 
 
@@ -256,10 +257,13 @@ hl.gesture({
 ---------------------
 
 hl.config({
-  input = {
-    -- Remaps Caps Lock to act as an additional Super key
-    kb_options = "caps:super",
-  }
+    input = {
+        -- Remaps Caps Lock to act as an additional Super key
+        kb_options = "caps:super",
+    },
+    general = {
+        no_focus_fallback = true, -- Don't wrap when using super + HJKL to move focus
+    }
 })
 
 
