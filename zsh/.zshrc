@@ -59,9 +59,11 @@ bindkey '^x^e' edit-command-line
 # Fix ssh terminal stuff acting weird for Ghostty
 alias ssh="env TERM=xterm-256color ssh"
 
+# for my linux machine:
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-conda() {
+condalinux() {
     __conda_setup="$('/home/easonni/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
     if [ $? -eq 0 ]; then
         eval "$__conda_setup"
@@ -76,6 +78,24 @@ conda() {
     # <<< conda initialize <<<
 }
 
+# for my mac machine:
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+condamac() {
+    __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+            . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+        else
+            export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+}
+
 function y() {
 	local tmp cwd; tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
 	command yazi "$@" --cwd-file="$tmp"
@@ -84,6 +104,12 @@ function y() {
 	command rm -f -- "$tmp"
 }
 
+# for my linux
 # >>> Codex installer >>>
 export PATH="/home/easonni/.local/bin:$PATH"
+# <<< Codex installer <<<
+
+# for my mac:
+# >>> Codex installer >>>
+export PATH="/Users/easonni/.local/bin:$PATH"
 # <<< Codex installer <<<
