@@ -16,6 +16,8 @@ case "$(uname -s)" in
       "$HOME/Documents/Coding"
       "$HOME/Documents/research projects"
       "$HOME/Documents/Summer 2026 MGH Intership"
+      "$HOME/Documents/2026-27 School Year"
+      "$HOME/Documents/2026-27 School Year/SRP"
     )
     ;;
 
