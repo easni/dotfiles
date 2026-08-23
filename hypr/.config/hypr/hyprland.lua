@@ -85,7 +85,7 @@ hl.config({
         -- Please see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/ before you turn this on
         allow_tearing = false,
 
-        layout = "master",
+        layout = "dwindle",
     },
 
     decoration = {
@@ -296,14 +296,9 @@ hl.bind(mainMod .. " + CTRL + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev
 -- Only for dwindle?
 hl.bind(mainMod .. " + slash", hl.dsp.layout("togglesplit"))    -- dwindle only
 
+-- Maximize and fullscreen
 hl.bind(mainMod .. " + Z", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })) --maximize
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" })) --fullscreen
-
--- -- Move focus with mainMod + arrow keys
--- hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
--- hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
--- hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
--- hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
 -- Move focus with mainMod + vim keys
 hl.bind(mainMod .. " + H",  hl.dsp.focus({ direction = "left" }))
@@ -336,6 +331,30 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- Screenshotting
+local screenshot_dir = os.getenv("HOME") .. "/Pictures/Screenshots"
+-- To disk
+hl.bind("ALT + SHIFT + 5", hl.dsp.exec_cmd(
+    'mkdir -p "' .. screenshot_dir .. '" && ' ..
+    'grim -g "$(slurp)" "' .. screenshot_dir .. '/$(date +%Y-%m-%d_%H-%M-%S).png"' .. ' && ' ..
+    'notify-send -t 5000 "Screenshot saved"'
+))
+hl.bind("ALT + SHIFT + 4", hl.dsp.exec_cmd(
+    'mkdir -p "' .. screenshot_dir .. '" && ' ..
+    'grim "' .. screenshot_dir .. '/$(date +%Y-%m-%d_%H-%M-%S).png"' .. ' && ' ..
+    'notify-send -t 5000 "Screenshot saved"'
+))
+
+-- To clipboard
+hl.bind("ALT + SUPER + SHIFT + 5", hl.dsp.exec_cmd(
+    'grim -g "$(slurp)" - | wl-copy' .. ' && ' ..
+    'notify-send -t 5000 "Screenshot copied to clipboard"'
+))
+hl.bind("ALT + SUPER + SHIFT + 4", hl.dsp.exec_cmd(
+    'grim - | wl-copy' .. ' && ' ..
+    'notify-send -t 5000 "Screenshot copied to clipboard"'
+))
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
