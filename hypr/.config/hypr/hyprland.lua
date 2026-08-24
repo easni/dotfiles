@@ -237,6 +237,12 @@ hl.config({
     },
 })
 
+-- Sensitivity for the specific red wireless mouse
+hl.device({
+    name = "logitech-m310-1",
+    sensitivity = -0.75,
+})
+
 hl.gesture({
     fingers = 3,
     direction = "horizontal",
