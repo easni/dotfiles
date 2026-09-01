@@ -17,6 +17,7 @@ cursor-color =#ffffff
 
 # minimum-contrast = 1
 font-size = 16
+config-file = ?Macos
 
 background-opacity = 0.85
 
