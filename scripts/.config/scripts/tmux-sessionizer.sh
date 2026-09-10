@@ -55,6 +55,10 @@ else
   )
 fi
 
+if [[ -z "$selected" ]]; then
+  exit 0
+fi
+
 # Make a safe tmux session name
 # Keep letters, numbers, underscores, hyphens
 selected_base=$(basename -- "$selected")
