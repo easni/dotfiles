@@ -442,6 +442,9 @@ do
       hl.LineNr = { fg = "#999999", bold = false }
       hl.CursorLineNr = { fg = "#ffffff", bold = true }
 
+      -- Make line of cursor more transparent
+      hl.CursorLine = { bg = "NONE" }
+
       -- Make top and bottom bars transparent
       hl.StatusLine = { bg = "NONE", fg = colors.fg }
       hl.StatusLineNC = { bg = "NONE", fg = colors.comment }
