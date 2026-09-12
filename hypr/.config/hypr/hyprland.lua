@@ -283,7 +283,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
--- hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + Y", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 -- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 
@@ -305,10 +305,10 @@ hl.bind(mainMod .. " + T",
 -- )
 
 -- Lock + sleep computer, keep everything running
-hl.bind(
-    mainMod .. " + CTRL + SHIFT + L",
-    hl.dsp.exec_cmd("sh -c 'pidof hyprlock >/dev/null || hyprlock & sleep 1; systemctl suspend'")
-)
+-- hl.bind(
+--     mainMod .. " + CTRL + SHIFT + L",
+--     hl.dsp.exec_cmd("sh -c 'pidof hyprlock >/dev/null || hyprlock & sleep 1; systemctl suspend'")
+-- )
 
 -- Actually log out and return to SDDM
 hl.bind(mainMod .. " + CTRL + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))

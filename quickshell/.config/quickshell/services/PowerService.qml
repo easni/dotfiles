@@ -4,11 +4,33 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import "../core"
+import "../styles"
+
 Singleton {
     id: root
 
+    property string pendingAction: ""
+
     Process {
         id: commandProcess
+    }
+
+    Timer {
+        id: delayedActionTimer
+
+        interval: Theme.animationNormal + 60
+        repeat: false
+
+        onTriggered: {
+            const action = root.pendingAction
+            root.pendingAction = ""
+
+            if (action === "lock")
+                root.lock()
+            else if (action === "suspend")
+                root.suspend()
+        }
     }
 
     function run(cmd) {
@@ -16,11 +38,24 @@ Singleton {
         commandProcess.running = true
     }
 
-    function lock() {
+    function luaString(value) {
+        return value.replace(/\\/g, "\\\\").replace(/"/g, "\\\"")
+    }
+
+    function hyprExec(command) {
         run([
-            "loginctl",
-            "lock-session"
+            "hyprctl",
+            "dispatch",
+            "hl.dsp.exec_cmd(\"" + luaString(command) + "\")"
         ])
+    }
+
+    function lock() {
+        hyprExec(Quickshell.shellPath("scripts/power-action.sh") + " lock")
+    }
+
+    function lockAfterIslandCollapse() {
+        resetThenRun("lock")
     }
 
     function logout() {
@@ -32,10 +67,17 @@ Singleton {
     }
 
     function suspend() {
-        run([
-            "systemctl",
-            "suspend"
-        ])
+        hyprExec(Quickshell.shellPath("scripts/power-action.sh") + " suspend")
+    }
+
+    function suspendAfterIslandCollapse() {
+        resetThenRun("suspend")
+    }
+
+    function resetThenRun(action) {
+        pendingAction = action
+        delayedActionTimer.restart()
+        IslandController.reset()
     }
 
     function reboot() {

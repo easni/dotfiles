@@ -16,6 +16,14 @@ FocusScope {
         forceActiveFocus()
     }
 
+    function lock() {
+        PowerService.lockAfterIslandCollapse()
+    }
+
+    function suspend() {
+        PowerService.suspendAfterIslandCollapse()
+    }
+
     Keys.onPressed: function(event) {
 
         switch (event.key) {
@@ -40,11 +48,11 @@ FocusScope {
             switch (selectedIndex) {
 
             case 0:
-                PowerService.lock()
+                root.lock()
                 break
 
             case 1:
-                PowerService.suspend()
+                root.suspend()
                 break
 
             case 2:
@@ -81,7 +89,7 @@ FocusScope {
 
             icon: "󰌾"
             title: "Lock"
-            action: PowerService.lock
+            action: root.lock
         }
 
         PowerOption {
@@ -89,7 +97,7 @@ FocusScope {
 
             icon: "󰤄"
             title: "Sleep"
-            action: PowerService.suspend
+            action: root.suspend
         }
 
         PowerOption {
