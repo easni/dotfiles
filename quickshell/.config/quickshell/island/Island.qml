@@ -7,6 +7,7 @@ Rectangle {
     id: root
 
     property real availableWidth: 420
+    property real availableHeight: 480
 
     clip: true
 
@@ -51,6 +52,7 @@ Rectangle {
     ViewHost {
         id: viewHost
         availableWidth: root.availableWidth
+        availableHeight: root.availableHeight
 
         anchors.centerIn: parent
     }

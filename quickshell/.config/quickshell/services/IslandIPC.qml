@@ -6,6 +6,9 @@ import "../core"
 IpcHandler {
     target: "luci"
 
+    function openAppLauncher() { LauncherController.openApps() }
+    function openClipboard() { LauncherController.openClipboard() }
+
     function openNotifications() {
         IslandController.openNotifications()
     }

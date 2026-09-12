@@ -19,7 +19,8 @@ PanelWindow {
         windows: [ root ]
 
         onCleared: {
-            IslandController.reset()
+            if (IslandState.launcher) LauncherController.close()
+            else if (IslandState.modal) IslandController.reset()
         }
     }
 
@@ -40,6 +41,7 @@ PanelWindow {
     Island {
         id: capsule
         availableWidth: Math.max(1, root.width - 20)
+        availableHeight: root.screen ? Math.max(1, root.screen.height - 20) : 480
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top

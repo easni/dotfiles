@@ -31,7 +31,7 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "ghostty"
 local fileManager = "dolphin"
-local menu = "rofi -show drun"
+local menu = "qs ipc call luci openAppLauncher"
 
 -------------------------------
 ---- ENVIRONMENT VARIABLES ----
@@ -377,7 +377,7 @@ hl.bind("ALT + SUPER + SHIFT + 4", hl.dsp.exec_cmd(
 ))
 
 -- Show clipboard history
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu -display-columns 2 | cliphist decode | wl-copy"))
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call luci openClipboard"))
 
 -- Laptop multimedia keys for volume and LCD brightness
 -- hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })

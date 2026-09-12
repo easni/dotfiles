@@ -15,6 +15,8 @@ QtObject {
     readonly property int themeSelectorMode: 4
     readonly property int wallpaperSelectorMode: 5
     readonly property int mediaControlsMode: 6
+    readonly property int appLauncherMode: 7
+    readonly property int clipboardMode: 8
 
     // =========================================================
     // STATE
@@ -30,7 +32,10 @@ QtObject {
     // DERIVED STATE
     // =========================================================
 
+    readonly property bool launcher: mode === appLauncherMode || mode === clipboardMode
+
     readonly property bool modal:
+        launcher ||
         mode === powerMenuMode ||
         mode === themeSelectorMode ||
         mode === wallpaperSelectorMode

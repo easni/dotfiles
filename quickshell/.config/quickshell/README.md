@@ -490,3 +490,50 @@ to your desktop daemon. Validated with Quickshell 0.3.1 and Qt 6.
 To return to Dunst, stop Luci first and start Dunst. To keep Luci's other features
 alongside Dunst, its `NotificationServer` must be disabled; simply starting both
 will recreate the registration conflict.
+
+## Island launchers
+
+**Super+R** opens Applications and **Super+V** opens Clipboard. These are separate
+search panels inside the island, using the active Luci theme. Pressing the same
+shortcut again closes its panel; the other shortcut switches panels with a fresh
+search. Neither panel changes the island's pinned state. On close, Luci restores
+a previously pinned non-modal view, or returns to the compact clock.
+
+- Type to search; use Up/Down or Ctrl+N/P to select a result.
+- Press Enter or click a result to launch an app or copy a clipboard entry.
+- Press Escape, click the close button, or click outside the island to dismiss.
+- Notifications stay in history while a launcher is open.
+
+Applications come from installed desktop entries, excluding entries hidden from
+menus. The empty search is alphabetical; searches prioritize matching app names
+and also cover descriptions, generic names, keywords, and desktop IDs. Launches
+use `gtk-launch`, including desktop-file working directories, field codes, and
+terminal applications. No app usage history is stored.
+
+Clipboard uses the existing text-only `cliphist` history, refreshed on each open.
+Selecting an entry restores the original text, including whitespace and newlines,
+and closes the picker. Paste it yourself with your application's normal shortcut.
+The picker has no image capture, deletion, or automatic paste. Failed decoding
+leaves the existing clipboard untouched; copying errors keep the picker open.
+Clipboard contents are not written to helper files or logs.
+
+Required commands: `gtk-launch`, `cliphist`, `wl-copy`, and `python3`. The existing
+`wl-paste --type text --watch cliphist store` startup process continues recording
+history. Rofi can remain installed; these two shortcuts no longer use it.
+
+The IPC entry points are:
+
+```sh
+qs ipc call luci openAppLauncher
+qs ipc call luci openClipboard
+```
+
+Run the launcher tests with:
+
+```sh
+python ~/.config/quickshell/tests/run_launcher_tests.py --output /tmp/luci-launcher-tests
+```
+
+The tests use a disposable app catalog, clipboard database, and copy receiver;
+they do not alter your real clipboard. Screenshots cover dark, light, and narrow
+layouts. The normal notification regression suite remains available separately.

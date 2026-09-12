@@ -9,9 +9,10 @@ Item {
     id: root
 
     property real availableWidth: 420
+    property real availableHeight: 480
 
     implicitWidth: viewLoader.item ? viewLoader.item.implicitWidth : 0
-    readonly property bool showBadge: IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.controlCenterMode && NotificationService.unreadCount > 0
+    readonly property bool showBadge: !IslandState.launcher && IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.controlCenterMode && NotificationService.unreadCount > 0
     implicitHeight: (viewLoader.item ? viewLoader.item.implicitHeight : 0) + (showBadge ? 34 : 0)
 
     NotificationBadge {
@@ -41,6 +42,11 @@ Item {
                 return overlayView
 
             switch (IslandState.mode) {
+            case IslandState.appLauncherMode:
+                return appLauncherView
+            case IslandState.clipboardMode:
+                return clipboardView
+
 
             case IslandState.expandedMode:
                 return expandedView
@@ -64,6 +70,15 @@ Item {
                 return defaultView
             }
         }
+    }
+
+    Component {
+        id: appLauncherView
+        AppLauncherView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
+    }
+    Component {
+        id: clipboardView
+        ClipboardView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {
