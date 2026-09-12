@@ -31,7 +31,7 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "ghostty"
 local fileManager = "dolphin"
-local menu = "rofi -show drun"
+local menu = "qs ipc call luci openAppLauncher"
 
 -------------------------------
 ---- ENVIRONMENT VARIABLES ----
@@ -69,15 +69,15 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
     general = {
-        gaps_in  = 5,
+        gaps_in  = 10,
         gaps_out = 20,
 
-        border_size = 2,
+        border_size = 0,
 
-        col = {
-            active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
-        },
+        -- col = {
+        --     active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
+        --     inactive_border = "rgba(595959aa)",
+        -- },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
         resize_on_border = false,
@@ -96,12 +96,12 @@ hl.config({
         active_opacity   = 1.0,
         inactive_opacity = 1.0,
 
-        shadow = {
-            enabled      = true,
-            range        = 4,
-            render_power = 3,
-            color        = 0xee1a1a1a,
-        },
+        -- shadow = {
+        --     enabled      = true,
+        --     range        = 4,
+        --     render_power = 3,
+        --     color        = 0xee1a1a1a,
+        -- },
 
         blur = {
             enabled   = true,
@@ -114,6 +114,10 @@ hl.config({
     animations = {
         enabled = true,
     },
+
+    cursor = {
+        warp_on_change_workspace = 1
+    }
 })
 
 -- -- Default curves and animations, see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Animations/
@@ -279,22 +283,32 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + Y", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+-- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+
+-- For Luci:
+hl.bind(mainMod .. " + P",
+    hl.dsp.exec_cmd("qs ipc call luci openPowerMenu"))
+
+hl.bind(mainMod .. " + W",
+    hl.dsp.exec_cmd("qs ipc call luci openWallpaperSelector"))
+
+hl.bind(mainMod .. " + T",
+    hl.dsp.exec_cmd("qs ipc call luci openThemeSelector"))
 
 
 -- Lock, keep everything running
-hl.bind(
-    mainMod .. " + CTRL + L",
-    hl.dsp.exec_cmd("pidof hyprlock >/dev/null || hyprlock")
-)
+-- hl.bind(
+--     mainMod .. " + CTRL + L",
+--     hl.dsp.exec_cmd("pidof hyprlock >/dev/null || hyprlock")
+-- )
 
 -- Lock + sleep computer, keep everything running
-hl.bind(
-    mainMod .. " + CTRL + SHIFT + L",
-    hl.dsp.exec_cmd("sh -c 'pidof hyprlock >/dev/null || hyprlock & sleep 1; systemctl suspend'")
-)
+-- hl.bind(
+--     mainMod .. " + CTRL + SHIFT + L",
+--     hl.dsp.exec_cmd("sh -c 'pidof hyprlock >/dev/null || hyprlock & sleep 1; systemctl suspend'")
+-- )
 
 -- Actually log out and return to SDDM
 hl.bind(mainMod .. " + CTRL + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
@@ -363,15 +377,36 @@ hl.bind("ALT + SUPER + SHIFT + 4", hl.dsp.exec_cmd(
 ))
 
 -- Show clipboard history
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu -display-columns 2 | cliphist decode | wl-copy"))
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call luci openClipboard"))
 
 -- Laptop multimedia keys for volume and LCD brightness
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+-- hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+-- hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
+-- hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
+-- hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
+-- hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
+-- hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+
+-- for Luci, use this instead:
+hl.bind("XF86AudioRaiseVolume",
+    hl.dsp.exec_cmd("~/.config/quickshell/scripts/volume.sh up"),
+    { locked = true, repeating = true })
+
+hl.bind("XF86AudioLowerVolume",
+    hl.dsp.exec_cmd("~/.config/quickshell/scripts/volume.sh down"),
+    { locked = true, repeating = true })
+
+hl.bind("XF86AudioMute",
+    hl.dsp.exec_cmd("~/.config/quickshell/scripts/volume.sh mute"),
+    { locked = true })
+
+hl.bind("XF86MonBrightnessUp",
+    hl.dsp.exec_cmd("~/.config/quickshell/scripts/brightness.sh +5%"),
+    { locked = true, repeating = true })
+
+hl.bind("XF86MonBrightnessDown",
+    hl.dsp.exec_cmd("~/.config/quickshell/scripts/brightness.sh 5%-"),
+    { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })

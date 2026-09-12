@@ -3,3 +3,6 @@
 *.jpg
 *.jpeg
 *.log
+*.qslog
+/hypr/.config/hypr/current-theme
+.current_theme
