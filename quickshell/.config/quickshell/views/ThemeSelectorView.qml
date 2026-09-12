@@ -62,7 +62,7 @@ FocusScope {
             id: themeView
 
             width: parent.width
-            height: 340
+            height: 390
 
             contentItem.x: 15
 

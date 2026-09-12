@@ -15,5 +15,6 @@ ShellRoot {
 
     IslandIPC {}
 
+    RoundedCorners {}
     IslandWindow {}
 }
