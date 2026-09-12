@@ -10,8 +10,8 @@ import "../styles"
 FocusScope {
     id: root
 
-    implicitWidth: 550
-    implicitHeight: 420
+    implicitWidth: 560
+    implicitHeight: 480
 
     focus: true
 
@@ -23,9 +23,9 @@ FocusScope {
     Column {
 
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: 20
 
-        spacing: 20
+        spacing: 10
 
         Item {
 
@@ -35,7 +35,6 @@ FocusScope {
             Text {
 
                 anchors.left: parent.left
-                anchors.leftMargin: 15
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: "Themes"
@@ -48,7 +47,6 @@ FocusScope {
             Text {
 
                 anchors.right: parent.right
-                anchors.rightMargin: 15
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: ThemeService.themes.count + " Themes"

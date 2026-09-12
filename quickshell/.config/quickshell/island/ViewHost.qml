@@ -12,13 +12,14 @@ Item {
     property real availableHeight: 480
 
     implicitWidth: viewLoader.item ? viewLoader.item.implicitWidth : 0
-    readonly property bool showBadge: !IslandState.launcher && IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.controlCenterMode && NotificationService.unreadCount > 0
-    implicitHeight: (viewLoader.item ? viewLoader.item.implicitHeight : 0) + (showBadge ? 34 : 0)
+    readonly property bool showBadge: IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.powerMenuMode && IslandState.mode !== IslandState.controlCenterMode && !NotificationController.visible && NotificationService.unreadCount > 0
+    implicitHeight: viewLoader.item ? viewLoader.item.implicitHeight : 0
 
     NotificationBadge {
         visible: root.showBadge
+        z: 10
         anchors.top: parent.top
-        anchors.topMargin: 4
+        anchors.topMargin: 21
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -26,7 +27,6 @@ Item {
         id: viewLoader
 
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: root.showBadge ? 17 : 0
 
         width: item ? item.implicitWidth : 0
         height: item ? item.implicitHeight : 0

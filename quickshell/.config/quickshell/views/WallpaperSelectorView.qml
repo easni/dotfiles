@@ -14,8 +14,8 @@ FocusScope {
         forceActiveFocus()
     }
 
-    implicitWidth: 550
-    implicitHeight: 460
+    implicitWidth: 560
+    implicitHeight: 480
 
     focus: true
 
@@ -25,8 +25,8 @@ FocusScope {
 
     Column {
         anchors.fill: parent
-        anchors.margins: 10
-        spacing: 20
+        anchors.margins: 20
+        spacing: 10
 
         Item {
 
@@ -35,7 +35,6 @@ FocusScope {
 
             Text {
                 anchors.left: parent.left
-                anchors.leftMargin: 30
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: "Wallpapers"
@@ -48,7 +47,6 @@ FocusScope {
             Text {
 
                 anchors.right: parent.right
-                anchors.rightMargin: 20
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: ThemeService.currentTheme
