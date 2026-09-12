@@ -16,6 +16,8 @@
       "pulseaudio",
       "battery",
       "cpu",
+      "custom/cpu-temperature",
+      "custom/gpu-temperature",
       "memory",
       "disk",
     ],
@@ -107,6 +109,18 @@
       "format": "cpu: {usage}%",
       "tooltip": true,
       "interval": 4
+    },
+    "custom/cpu-temperature": {
+      "exec": "$HOME/.config/waybar/temperature.sh cpu",
+      "format": "{}",
+      "interval": 5,
+      "tooltip": false
+    },
+    "custom/gpu-temperature": {
+      "exec": "$HOME/.config/waybar/temperature.sh gpu",
+      "format": "{}",
+      "interval": 5,
+      "tooltip": false
     },
     "memory": {
       "format": "mem: {used:0.1f}G",
