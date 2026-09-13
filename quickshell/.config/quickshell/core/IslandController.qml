@@ -16,6 +16,18 @@ QtObject {
         openControlCenterFromRightSection()
     }
 
+    function openCalendar() {
+        ignoreNextIslandTap()
+        IslandState.returnToExpanded = IslandState.islandPinned
+        IslandState.islandPinned = false
+        IslandState.mode = IslandState.calendarMode
+    }
+
+    function closeCalendar() {
+        if (IslandState.returnToExpanded) restoreExpanded()
+        else reset()
+    }
+
     function openDefault() {
         IslandState.mode =
             IslandState.defaultMode

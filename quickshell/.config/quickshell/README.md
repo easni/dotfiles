@@ -537,3 +537,40 @@ python ~/.config/quickshell/tests/run_launcher_tests.py --output /tmp/luci-launc
 The tests use a disposable app catalog, clipboard database, and copy receiver;
 they do not alter your real clipboard. Screenshots cover dark, light, and narrow
 layouts. The normal notification regression suite remains available separately.
+
+## Calendar
+
+Click the expanded date to open the read-only calendar. It opens
+on the current month with Sunday-first weeks. Click a date for its day timeline,
+or switch between Month, Week, and Day. Event blocks open read-only details.
+Month scrolls vertically through week rows: Up/Down moves one row, and dragging
+snaps to a row on release. Weekday labels stay fixed; the month buttons jump a
+month. In Week and Day, Left/Right and horizontal drags navigate with a slide animation:
+drag left to move forward, right to move back. The date heading also accepts
+drags, including in narrow week layouts where the timeline scrolls sideways.
+Adjacent pages stay rendered during partial drags. Week and day timelines retain
+their vertical scroll position across date navigation and share it with previews.
+Ctrl+scroll zooms the week/day time scale around the pointer. The scale is shared
+with adjacent pages and resets when the calendar closes; month view is unchanged.
+The unread notification badge opens notification history.
+Escape returns from details, then closes the calendar; clicking outside also
+closes it and restores an explicitly pinned island.
+
+Events are read from a running `dcal` daemon using `calendars.list` and paginated
+`events.list` IPC calls. Hidden and sync-disabled calendars are excluded. The
+panel preloads nearby dates and refreshes on opening, when navigation approaches
+the edge of its cached range, and every 30 seconds while visible.
+It does not start dcal, sync accounts, or modify events. When dcal is unavailable,
+dates still work; the refresh button retries loading. Times use the system
+timezone and 24-hour notation. All-day entries retain their calendar dates.
+Failed launches and requests exceeding ten seconds leave a retryable error;
+the regular polling timer recovers when dcal becomes available, without restarting
+Quickshell.
+
+```sh
+python3 ~/.config/quickshell/tests/run_calendar_tests.py
+```
+
+The calendar tests use a private session bus, disposable config, and fixture
+`dcal` executable. Screenshots and logs are saved to
+`/tmp/quickshell-calendar-tests`.

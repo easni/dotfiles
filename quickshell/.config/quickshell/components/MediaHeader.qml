@@ -25,7 +25,7 @@ Item {
 
             showCava: false
 
-            titleWidth: 140
+            titleWidth: 220
             artistWidth: 220
 
             titleFontSize: 13

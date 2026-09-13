@@ -78,7 +78,7 @@ Item {
     }
 
     function shouldScroll() {
-        return label.width > root.maxWidth + 20
+        return label.width > root.maxWidth + 12
     }
 
     onTextChanged: {

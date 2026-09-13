@@ -3,6 +3,7 @@ import "../styles"
 
 Item {
     id: root
+    objectName: "clock"
 
     property bool expanded: false
 
