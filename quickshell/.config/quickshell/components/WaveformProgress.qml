@@ -93,9 +93,9 @@ Item {
             id: rightTime
 
             text:
-                MediaService.formatTime(
-                    MediaService.length
-                )
+                MediaService.length > 0
+                    ? MediaService.formatTime(MediaService.length)
+                    : "--:--"
 
             color: Theme.textSecondary
             font.pixelSize: 16
