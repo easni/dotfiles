@@ -3,3 +3,5 @@ set selection-clipboard clipboard
 map go goto top
 
 map b focus_inputbar ":bjump "
+
+include Macosrc
