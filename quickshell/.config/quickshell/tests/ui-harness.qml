@@ -11,6 +11,7 @@ import "../styles/themes/monochrome" as Dark
 
 ShellRoot {
     id: testRoot
+    IslandIPC { }
     function findItem(item, name) {
         if (!item.visible) return null
         if (item.objectName === name) return item
