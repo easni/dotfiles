@@ -18,11 +18,6 @@ Singleton {
     property int position: 0
     property int length: 0
 
-    property string _trackIdentity: ""
-    property bool _usingSyntheticPosition: false
-    property real _syntheticPositionStart: 0
-    property double _syntheticPositionStartedAt: 0
-
     property url icon: Qt.resolvedUrl("../assets/icons/music.svg")
 
     property string subtitle:
@@ -35,70 +30,8 @@ Singleton {
     readonly property int playbackPlaying: 1
     readonly property int playbackPaused: 2
 
-    function trackIdentityFor(player) {
-
-        if (!player)
-            return ""
-
-        return [
-            player.trackTitle,
-            player.trackArtist
-        ].join("\n")
-    }
-
-    function resetTimingIfTrackChanged() {
-
-        let nextTrackIdentity = trackIdentityFor(player)
-
-        if (nextTrackIdentity === _trackIdentity)
-            return
-
-        _trackIdentity = nextTrackIdentity
-        resetTrackTiming()
-    }
-
-    function resetTrackTiming() {
-
-        position = 0
-        length = 0
-        _usingSyntheticPosition = true
-        _syntheticPositionStart = 0
-        _syntheticPositionStartedAt = Date.now()
-    }
-
-    function syntheticPosition() {
-
-        if (!_usingSyntheticPosition)
-            return position
-
-        if (!isPlaying)
-            return _syntheticPositionStart
-
-        return _syntheticPositionStart +
-            ((Date.now() - _syntheticPositionStartedAt) / 1000)
-    }
-
     function updatePosition(rawPosition) {
-
-        let reportedPosition = Math.max(0, rawPosition || 0)
-
-        if (!_usingSyntheticPosition) {
-            position = reportedPosition
-            return
-        }
-
-        let localPosition = syntheticPosition()
-        let plausiblePosition =
-            reportedPosition <= Math.max(10, localPosition + 4) &&
-            (length <= 0 || reportedPosition <= length + 2)
-
-        if (plausiblePosition) {
-            _usingSyntheticPosition = false
-            position = reportedPosition
-            return
-        }
-
-        position = Math.floor(localPosition)
+        position = Number.isFinite(rawPosition) ? Math.max(0, Math.floor(rawPosition)) : 0
     }
 
     function updateLength(rawLength) {
@@ -113,8 +46,6 @@ Singleton {
         if (Mpris.players.values.length === 0) {
 
             player = null
-            _trackIdentity = ""
-            _usingSyntheticPosition = false
 
             title = ""
             artist = ""
@@ -127,13 +58,7 @@ Singleton {
             return
         }
 
-        if (player !== Mpris.players.values[0]) {
-            player = Mpris.players.values[0]
-            _trackIdentity = ""
-            resetTrackTiming()
-        }
-
-        resetTimingIfTrackChanged()
+        player = Mpris.players.values[0]
 
         title = player.trackTitle
         artist = player.trackArtist
@@ -197,13 +122,11 @@ Singleton {
 
         function onTrackTitleChanged() {
             root.title = player.trackTitle
-            root.resetTimingIfTrackChanged()
             root.updateLength(player.length)
         }
 
         function onTrackArtistChanged() {
             root.artist = player.trackArtist
-            root.resetTimingIfTrackChanged()
             root.updateLength(player.length)
         }
 
@@ -214,16 +137,8 @@ Singleton {
         }
 
         function onPlaybackStateChanged() {
-            let wasPlaying = root.isPlaying
-
             root.isPlaying =
                 player.playbackState === root.playbackPlaying
-
-            if (!root._usingSyntheticPosition || wasPlaying === root.isPlaying)
-                return
-
-            root._syntheticPositionStart = root.syntheticPosition()
-            root._syntheticPositionStartedAt = Date.now()
         }
 
         function onPositionChanged() {
