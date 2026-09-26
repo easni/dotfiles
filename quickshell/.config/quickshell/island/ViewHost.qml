@@ -12,7 +12,7 @@ Item {
     property real availableHeight: 480
 
     implicitWidth: viewLoader.item ? viewLoader.item.implicitWidth : 0
-    readonly property bool showBadge: IslandState.mode !== IslandState.calendarMode && IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.powerMenuMode && IslandState.mode !== IslandState.controlCenterMode && !NotificationController.visible && NotificationService.unreadCount > 0
+    readonly property bool showBadge: IslandState.mode !== IslandState.bluetoothMode && IslandState.mode !== IslandState.calendarMode && IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.powerMenuMode && IslandState.mode !== IslandState.controlCenterMode && !NotificationController.visible && NotificationService.unreadCount > 0
     implicitHeight: viewLoader.item ? viewLoader.item.implicitHeight : 0
 
     NotificationBadge {
@@ -42,6 +42,8 @@ Item {
                 return overlayView
 
             switch (IslandState.mode) {
+            case IslandState.bluetoothMode:
+                return bluetoothView
             case IslandState.calendarMode:
                 return calendarView
             case IslandState.appLauncherMode:
@@ -72,6 +74,11 @@ Item {
                 return defaultView
             }
         }
+    }
+
+    Component {
+        id: bluetoothView
+        BluetoothView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {

@@ -12,6 +12,26 @@ QtObject {
     // Open a specific island view/mode.
     // =========================================================
 
+    property bool bluetoothReturnPinned: false
+    property bool bluetoothReturnExpanded: false
+
+    function openBluetooth() {
+        if (IslandState.mode === IslandState.bluetoothMode) { closeBluetooth(); return }
+        ignoreNextIslandTap()
+        bluetoothReturnPinned = IslandState.mode === IslandState.controlCenterMode && IslandState.islandPinned
+        bluetoothReturnExpanded = IslandState.returnToExpanded || (IslandState.mode === IslandState.expandedMode && IslandState.islandPinned)
+        IslandState.returnToExpanded = bluetoothReturnExpanded
+        IslandState.islandPinned = bluetoothReturnPinned
+        IslandState.mode = IslandState.bluetoothMode
+    }
+
+    function closeBluetooth() {
+        ignoreNextIslandTap()
+        IslandState.islandPinned = bluetoothReturnPinned
+        IslandState.returnToExpanded = bluetoothReturnExpanded
+        IslandState.mode = IslandState.controlCenterMode
+    }
+
     function openNotifications() {
         openControlCenterFromRightSection()
     }

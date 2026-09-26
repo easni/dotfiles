@@ -28,7 +28,8 @@ Item {
 
             if (
                 IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode
+                IslandState.mode === IslandState.controlCenterMode ||
+                IslandState.mode === IslandState.bluetoothMode
             )
                 return
 
@@ -40,7 +41,8 @@ Item {
 
             if (
                 IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode
+                IslandState.mode === IslandState.controlCenterMode ||
+                IslandState.mode === IslandState.bluetoothMode
             ) {
 
                 if (!IslandState.islandPinned)
@@ -125,7 +127,8 @@ Item {
 
             if (
                 IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode
+                IslandState.mode === IslandState.controlCenterMode ||
+                IslandState.mode === IslandState.bluetoothMode
             )
                 return
 
@@ -145,7 +148,8 @@ Item {
 
             if (
                 IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode
+                IslandState.mode === IslandState.controlCenterMode ||
+                IslandState.mode === IslandState.bluetoothMode
             ) {
 
                 if (IslandState.returnToExpanded) {

@@ -611,3 +611,27 @@ For an opt-in check against actual playback, run
 feeds and reconnection, briefly lowers the default output by one percentage point,
 and restores its volume. This check requires audio to be playing and accesses
 your live audio session; it is separate from the isolated test suites.
+
+## Bluetooth and device batteries
+
+Click the Bluetooth card in the control center to open **Bluetooth & Devices**,
+or run `qs ipc call luci openBluetooth`. Back or Escape returns to the control
+center; Close collapses the island. The panel follows the island's hover and pin
+behavior. Click empty header space to toggle pinning.
+
+Saved Bluetooth devices have Connect/Disconnect actions. The power button controls
+the selected adapter. Pairing, discovery, and device removal remain in your
+existing Bluetooth settings. Connected audio devices offer **Use for audio** to
+set the default output and move current playback streams without changing volume.
+Connecting a device alone does not change audio routing.
+
+The receiver section reads Logitech batteries using `solaar show` (tested with
+Solaar 1.1.20). Install the distribution's `solaar` package and its normal device
+access rules; no Solaar GUI or autostart is required. It refreshes on opening,
+on request, and every 60 seconds while the panel is visible. Sleeping devices and
+failed reads retain clearly labeled last-known values in memory. Missing battery
+reports are shown as unavailable, not zero. Receiver devices are read-only.
+
+Run `python3 tests/run_device_tests.py` from this configuration directory for
+isolated device, battery, audio-routing, navigation, and layout tests. The suite
+uses fake commands and devices and writes screenshots to `/tmp/luci-device-tests`.

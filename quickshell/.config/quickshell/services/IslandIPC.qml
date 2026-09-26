@@ -7,6 +7,8 @@ import "../island"
 IpcHandler {
     target: "luci"
 
+    function openBluetooth() { IslandController.openBluetooth() }
+
     function openAppLauncher() { LauncherController.openApps() }
     function openClipboard() { LauncherController.openClipboard() }
 

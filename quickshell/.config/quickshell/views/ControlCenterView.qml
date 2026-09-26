@@ -93,7 +93,7 @@ Item {
 
                     active: BluetoothService.enabled
 
-                    onClicked: BluetoothService.toggle()
+                    onClicked: IslandController.openBluetooth()
                 }
 
                 ControlCard {

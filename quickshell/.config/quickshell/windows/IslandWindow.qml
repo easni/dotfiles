@@ -25,7 +25,7 @@ PanelWindow {
         }
     }
 
-    focusable: focusGrab.active
+    focusable: focusGrab.active || (ThemeService.ready && IslandState.mode === IslandState.bluetoothMode)
 
     anchors {
         top: true

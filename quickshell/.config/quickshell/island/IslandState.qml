@@ -18,6 +18,7 @@ QtObject {
     readonly property int appLauncherMode: 7
     readonly property int clipboardMode: 8
     readonly property int calendarMode: 9
+    readonly property int bluetoothMode: 10
 
     // =========================================================
     // STATE
