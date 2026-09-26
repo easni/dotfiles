@@ -10,15 +10,22 @@ import "../styles"
 FocusScope {
     id: root
 
-    implicitWidth: 560
-    implicitHeight: 480
+    property real availableWidth: 560
+    property real availableHeight: 480
+    implicitWidth: Math.min(560, availableWidth)
+    implicitHeight: Math.min(480, availableHeight)
 
     focus: true
 
     property int selectedIndex: 0
-    property int columns: 3
+    readonly property int columns: Math.max(1, Math.min(3, Math.floor((width - 40) / 150)))
 
-    Component.onCompleted: forceActiveFocus()
+    Component.onCompleted: {
+        for (let i = 0; i < ThemeService.themes.count; ++i)
+            if (ThemeService.themes.get(i).themeId === ThemeService.currentTheme) selectedIndex = i
+        forceActiveFocus()
+    }
+    onSelectedIndexChanged: themeView.positionViewAtIndex(selectedIndex, GridView.Contain)
 
     Column {
 
@@ -62,9 +69,8 @@ FocusScope {
             id: themeView
 
             width: parent.width
-            height: 390
+            height: Math.max(0, root.height - 80)
 
-            contentItem.x: 15
 
             clip: true
 
@@ -72,7 +78,7 @@ FocusScope {
 
             boundsBehavior: Flickable.StopAtBounds
 
-            cellWidth: (width - 32) / root.columns
+            cellWidth: width / root.columns
             cellHeight: 116
 
             model: ThemeService.themes
@@ -117,7 +123,7 @@ FocusScope {
 
                     onClicked: {
 
-                        themeView.currentIndex = index
+                        root.selectedIndex = index
 
                         ThemeService.apply(model.themeId)
 

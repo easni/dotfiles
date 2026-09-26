@@ -79,7 +79,7 @@ Rectangle {
 
             spacing: 2
 
-            width: 80   
+            width: Math.max(0, root.width - 70)
 
             Text {
                 width: parent.width
@@ -109,7 +109,7 @@ Rectangle {
     }
 
     HoverHandler {
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     }
 
     TapHandler {

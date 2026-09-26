@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../styles"
 import "../components"
@@ -12,164 +13,199 @@ Item {
 
     clip: true
     
-    property Item wifiSvc
+    property real availableWidth: 520
+    property real availableHeight: 530
+    implicitWidth: Math.min(520, availableWidth)
+    implicitHeight: Math.min(530, availableHeight)
 
-    implicitWidth: 520
-    implicitHeight: 530
+    RowLayout {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 22
+        height: 28
+        Text {
+            text: "Control Center"
+            color: Theme.textPrimary
+            font.pixelSize: 20
+            font.bold: true
+            Layout.fillWidth: true
+        }
+        NotificationButton {
+            text: "×"
+            subtle: true
+            Accessible.name: "Close control center"
+            onClicked: IslandController.reset()
+        }
+    }
 
-    ColumnLayout {
+    Flickable {
+        id: scroll
         anchors.fill: parent
         anchors.margins: 22
+        anchors.topMargin: 68
+        clip: true
+        contentWidth: width
+        contentHeight: content.height
+        boundsBehavior: Flickable.StopAtBounds
+        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
-        spacing: 18
+        ColumnLayout {
+            id: content
+            width: scroll.width
+            height: Math.max(scroll.height, controlGrid.implicitHeight + 264)
+            spacing: 18
 
-        RowLayout {
-            Layout.fillWidth: true
-            Text {
-                text: "Control Center"
-                color: Theme.textPrimary
-                font.pixelSize: 20
-                font.bold: true
+            GridLayout {
+                id: controlGrid
                 Layout.fillWidth: true
-            }
-            NotificationButton {
-                text: "×"
-                subtle: true
-                Accessible.name: "Close control center"
-                onClicked: IslandController.reset()
-            }
-        }
 
-        GridLayout {
-            Layout.fillWidth: true
+                columns: root.width < 330 ? 1 : root.width < 500 ? 2 : 3
 
-            columns: 3
+                columnSpacing: 12
+                rowSpacing: 12
 
-            columnSpacing: 12
-            rowSpacing: 12
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
 
-            ControlCard {
+                    iconSource: WifiService.svgIcon
 
-                iconSource: WifiService.svgIcon
+                    title: "Wi-Fi"
 
-                title: "Wi-Fi"
+                    subtitle: WifiService.subtitle
 
-                subtitle: WifiService.subtitle
+                    active: WifiService.enabled
+                    enabled: WifiService.available && !WifiService.busy
 
-                active: WifiService.connected
+                    onClicked: WifiService.toggle()
+                }
 
-                onClicked: WifiService.toggle()
-            }
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
 
-            ControlCard {
+                    iconSource: BluetoothService.icon
 
-                iconSource: BluetoothService.icon
+                    title: "Bluetooth"
 
-                title: "Bluetooth"
+                    subtitle: BluetoothService.subtitle
 
-                subtitle: BluetoothService.subtitle
+                    active: BluetoothService.enabled
 
-                active: BluetoothService.enabled
+                    onClicked: BluetoothService.toggle()
+                }
 
-                onClicked: BluetoothService.toggle()
-            }
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
 
-            ControlCard {
+                    iconSource: MicrophoneService.icon
 
-                iconSource: MicrophoneService.icon
+                    title: "Microphone"
 
-                title: "Microphone"
+                    subtitle: MicrophoneService.subtitle
 
-                subtitle: MicrophoneService.subtitle
+                    active: !MicrophoneService.muted
 
-                active: !MicrophoneService.muted
+                    onClicked: MicrophoneService.toggle()
+                }
 
-                onClicked: MicrophoneService.toggle()
-            }
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
 
-            ControlCard {
+                    iconSource: NightLightService.icon
 
-                iconSource: NightLightService.icon
+                    title: "Night Light"
 
-                title: "Night Light"
+                    subtitle: NightLightService.subtitle
 
-                subtitle: NightLightService.subtitle
+                    active: NightLightService.enabled
 
-                active: NightLightService.enabled
+                    onClicked: NightLightService.toggle()
+                }
 
-                onClicked: NightLightService.toggle()
-            }
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
 
-            ControlCard {
+                    iconSource: FocusService.icon
 
-                iconSource: FocusService.icon
+                    title: "Focus"
 
-                title: "Focus"
+                    subtitle: FocusService.subtitle
 
-                subtitle: FocusService.subtitle
+                    active: FocusService.enabled
 
-                active: FocusService.enabled
+                    onClicked: FocusService.toggle()
+                }
 
-                onClicked: FocusService.toggle()
-            }
+                ControlCard {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    iconSource: MediaService.icon
 
-            ControlCard {
-                iconSource: MediaService.icon
+                    title: "Media"
 
-                title: "Media"
+                    subtitle: MediaService.subtitle
 
-                subtitle: MediaService.subtitle
+                    active: MediaService.hasPlayer
 
-                active: MediaService.hasPlayer
-
-                onClicked: {
-                    IslandController.openMediaControls()
+                    onClicked: {
+                        IslandController.openMediaControls()
+                    }
                 }
             }
-        }
 
-        ControlSlider {
+            ControlSlider {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                label: "Volume"
+                iconSource: AudioService.volumeIcon
 
-            iconSource: AudioService.volumeIcon
+                value: AudioService.volume / 100
 
-            value: AudioService.volume / 100
+                onValueChangedByUser: function(value) {
 
-            onValueChangedByUser: function(value) {
-
-                AudioService.setVolume(
-                    value * 100
-                )
+                    AudioService.setVolume(
+                        value * 100
+                    )
+                }
             }
-        }
 
-        ControlSlider {
+            ControlSlider {
+                Layout.fillWidth: true
+                Layout.minimumWidth: 0
+                label: "Brightness"
+                iconSource: BrightnessService.brightnessIcon
 
-            iconSource: BrightnessService.brightnessIcon
+                value: BrightnessService.brightness / 100
 
-            value: BrightnessService.brightness / 100
+                onValueChangedByUser: function(value) {
 
-            onValueChangedByUser: function(value) {
-
-                BrightnessService.setBrightness(
-                    value * 100
-                )
+                    BrightnessService.setBrightness(
+                        value * 100
+                    )
+                }
             }
-        }
 
-        Rectangle {
+            Rectangle {
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.minimumHeight: 140
 
-            radius: 14
+                radius: 14
 
-            color: Theme.surface
+                color: Theme.surface
 
-            clip: true
+                clip: true
 
-            NotificationView {
-                anchors.fill: parent
-                anchors.margins: 14
+                NotificationView {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                }
             }
         }
     }

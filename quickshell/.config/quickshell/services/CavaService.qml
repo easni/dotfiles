@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 
 Singleton {
     id: root
@@ -10,6 +11,18 @@ Singleton {
     property var bars: []
 
     property bool shouldRun: true
+    property var audioSink: Pipewire.defaultAudioSink
+
+    // CAVA can retain its old monitor connection after an output switch.
+    onAudioSinkChanged: reconnect()
+    onShouldRunChanged: reconnect()
+
+    function reconnect() {
+        restartTimer.stop()
+        bars = []
+        if (cava.running) cava.running = false
+        else if (shouldRun && audioSink) restartTimer.restart()
+    }
 
     Process {
         id: cava
@@ -19,7 +32,7 @@ Singleton {
         command: [
             "cava",
             "-p",
-            Quickshell.env("HOME") + "/.config/quickshell/scripts/cava.conf"
+            Quickshell.shellPath("scripts/cava.conf")
         ]
 
         stdout: SplitParser {
@@ -48,37 +61,21 @@ Singleton {
 
             root.bars = []
 
-            if (root.shouldRun)
+            if (root.shouldRun && root.audioSink)
                 restartTimer.restart()
                 
         }
     }
 
     Timer {
-        id: startupTimer
-
-        interval: 1000
-        repeat: false
-        running: true
-
-        onTriggered: {
-            cava.running = true
-        }
-    }
-
-    Timer {
         id: restartTimer
-
-        interval: 1000
+        interval: 250
         repeat: false
-
         onTriggered: {
-
-            if (!root.shouldRun)
-                return
-
-            cava.running = false
-            cava.running = true
+            if (root.shouldRun && root.audioSink && !cava.running)
+                cava.running = true
         }
     }
+
+    Component.onCompleted: reconnect()
 }

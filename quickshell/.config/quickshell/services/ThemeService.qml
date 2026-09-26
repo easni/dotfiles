@@ -12,8 +12,18 @@ Singleton {
 
     property string currentTheme: "monochrome"
 
+    property string pendingTheme: ""
+
     Process {
         id: process
+        onExited: root.saveTheme()
+    }
+
+    function saveTheme() {
+        if (process.running || pendingTheme === "") return
+        process.command = ["bash", Quickshell.shellPath("scripts/theme.sh"), pendingTheme]
+        pendingTheme = ""
+        process.running = true
     }
 
     property ListModel themes: ListModel {
@@ -231,7 +241,11 @@ Singleton {
         }
     }
     
-    function apply(themeName) {
+    function apply(themeName, persist = true) {
+        if (!/^[a-z0-9]+$/.test(themeName)) {
+            if (!ready) apply("monochrome", false)
+            return
+        }
 
         var component = Qt.createComponent(
             "../styles/themes/" + themeName + "/Theme.qml"
@@ -244,6 +258,10 @@ Singleton {
                 component.errorString()
             )
 
+            if (!ready) {
+                if (themeName !== "monochrome") apply("monochrome", false)
+                else ready = true
+            }
             return
         }
 
@@ -252,6 +270,10 @@ Singleton {
         if (!theme) {
 
             console.error("Failed to create theme object.")
+            if (!ready) {
+                if (themeName !== "monochrome") apply("monochrome", false)
+                else ready = true
+            }
 
             return
         }
@@ -264,13 +286,10 @@ Singleton {
 
         WallpaperService.reload()
 
-        process.command = [
-            "bash",
-            Quickshell.env("HOME") + "/.config/quickshell/scripts/theme.sh",
-            themeName
-        ]
-
-        process.running = true
+        if (persist) {
+            pendingTheme = themeName
+            saveTheme()
+        }
 
         ready = true
     }
@@ -344,9 +363,8 @@ Singleton {
         id: themeReader
 
         command: [
-            "bash",
-            "-c",
-            "cat " + Quickshell.env("HOME") + "/.config/quickshell/.current_theme"
+            "cat",
+            Quickshell.shellPath(".current_theme")
         ]
 
         stdout: StdioCollector {
@@ -358,7 +376,7 @@ Singleton {
                 if (savedTheme !== "")
                     root.currentTheme = savedTheme
 
-                apply(root.currentTheme)
+                apply(root.currentTheme, false)
             }
         }
     }

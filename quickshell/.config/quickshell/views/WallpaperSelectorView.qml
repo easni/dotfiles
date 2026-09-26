@@ -14,14 +14,16 @@ FocusScope {
         forceActiveFocus()
     }
 
-    implicitWidth: 560
-    implicitHeight: 480
+    property real availableWidth: 560
+    property real availableHeight: 480
+    implicitWidth: Math.min(560, availableWidth)
+    implicitHeight: Math.min(480, availableHeight)
 
     focus: true
 
     property int selectedIndex: wallpaperView.currentIndex
 
-    property int columns: 3
+    readonly property int columns: Math.max(1, Math.min(3, Math.floor((width - 40) / 150)))
 
     Column {
         anchors.fill: parent
@@ -62,9 +64,8 @@ FocusScope {
             id: wallpaperView
 
             width: parent.width
-            height: 340
+            height: Math.max(0, root.height - 126)
 
-            contentItem.x: 15
 
             clip: true
 
@@ -74,7 +75,7 @@ FocusScope {
             keyNavigationEnabled: true
             focus: true
 
-            cellWidth: (width - 32) / columns
+            cellWidth: width / root.columns
             cellHeight: 116
 
             model: WallpaperService.currentModel
@@ -130,7 +131,7 @@ FocusScope {
 
             Rectangle {
 
-                width: 145
+                width: Math.min(145, (root.width - 52) * 0.58)
                 height: 36
 
                 radius: 12
@@ -162,7 +163,7 @@ FocusScope {
 
                     anchors.centerIn: parent
 
-                    text: "Theme Wallpapers"
+                    text: root.width < 360 ? "Theme" : "Theme Wallpapers"
 
                     color: WallpaperService.themeOnly
                         ? Theme.buttonText
@@ -175,7 +176,7 @@ FocusScope {
 
             Rectangle {
 
-                width: 110
+                width: Math.min(110, (root.width - 52) * 0.42)
                 height: 36
 
                 radius: 12

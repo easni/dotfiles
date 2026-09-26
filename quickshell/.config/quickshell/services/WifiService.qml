@@ -4,122 +4,97 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-import "../services"
-
 Singleton {
-
     id: root
 
-    // =========================================================
-    // STATE
-    // =========================================================
-
+    property bool enabled: false
     property bool connected: false
-    property bool connecting: false
-
+    readonly property bool connecting: wifiToggle.running
+    readonly property bool busy: radioReader.running || wifiReader.running || wifiToggle.running
+    property bool available: false
+    property string error: ""
     property int strength: 0
     property string ssid: ""
+    readonly property string subtitle: error !== "" ? error
+        : connecting ? "Updating…"
+        : !available ? "Unavailable"
+        : !enabled ? "Off"
+        : connected ? ssid : "Not connected"
+    readonly property string icon: !connected ? "󰤮"
+        : strength >= 80 ? "󰤨" : strength >= 60 ? "󰤥"
+        : strength >= 40 ? "󰤢" : strength >= 20 ? "󰤟" : "󰤯"
+    readonly property url svgIcon: Qt.resolvedUrl(enabled
+        ? "../assets/icons/wifi.svg" : "../assets/icons/wifi-off.svg")
 
-    property string icon: "󰤮"
-
-    property string subtitle:
-        connected
-            ? ssid
-            : (connecting
-                ? "Connecting..."
-                : "Disconnected")
-
-    property url svgIcon: !connected
-        ? Qt.resolvedUrl("../assets/icons/wifi-off.svg")
-        : Qt.resolvedUrl("../assets/icons/wifi.svg")
-
-
-    // =========================================================
-    // NOTIFICATION STATE
-    // =========================================================
-
-    // Used so Luci doesn't send a notification when
-    // the service first starts and reads the current state.
     property bool initialized: false
-
     property bool previousConnected: false
     property string previousSsid: ""
 
-
-    // =========================================================
-    // WIFI READER
-    // =========================================================
-
     Process {
-
-        id: wifiReader
-
-        command: [
-            "bash",
-            "-c",
-            "nmcli -t -f ACTIVE,SIGNAL,SSID dev wifi | grep '^yes:'"
-        ]
-
-        stdout: StdioCollector {
-
-            onStreamFinished: {
-
-                let line = text.trim()
-
-
-                // -------------------------------------------------
-                // Disconnected
-                // -------------------------------------------------
-
-                if (line === "") {
-
-                    root.connected = false
-                    root.strength = 0
-                    root.ssid = ""
-
-                    root.updateIcon()
-                    root.handleStateChange()
-
-                    return
-                }
-
-
-                // -------------------------------------------------
-                // Connected
-                // -------------------------------------------------
-
-                let parts = line.split(":")
-
-                root.connected = true
-                root.connecting = false
-
-                root.strength = Number(parts[1])
-                root.ssid = parts.slice(2).join(":")
-
-                root.updateIcon()
+        id: radioReader
+        command: ["nmcli", "-w", "3", "radio", "wifi"]
+        environment: ({ LC_ALL: "C" })
+        stdout: StdioCollector { id: radioOutput }
+        onExited: function(code) {
+            const state = radioOutput.text.trim()
+            root.available = code === 0 && (state === "enabled" || state === "disabled")
+            if (!root.available) return
+            root.enabled = state === "enabled"
+            if (root.enabled) wifiReader.running = true
+            else {
+                root.connected = false
+                root.ssid = ""
+                root.strength = 0
                 root.handleStateChange()
             }
         }
     }
 
-
-    // =========================================================
-    // WIFI TOGGLE
-    // =========================================================
+    Process {
+        id: wifiReader
+        command: ["nmcli", "-w", "3", "-t", "-f", "ACTIVE,SIGNAL,SSID", "dev", "wifi", "list", "--rescan", "no"]
+        environment: ({ LC_ALL: "C" })
+        stdout: StdioCollector { id: wifiOutput }
+        onExited: function(code) {
+            if (code !== 0) {
+                root.available = false
+                return
+            }
+            const line = wifiOutput.text.split("\n").find(line => line.startsWith("yes:")) || ""
+            const parts = line.split(":")
+            root.connected = line !== ""
+            root.strength = root.connected ? Number(parts[1]) : 0
+            root.ssid = root.connected ? parts.slice(2).join(":").replace(/\\(.)/g, "$1") : ""
+            root.handleStateChange()
+        }
+    }
 
     Process {
-
         id: wifiToggle
-
-        onExited: {
+        onExited: function(code) {
+            root.error = code === 0 ? "" : "Could not change Wi-Fi"
             root.update()
         }
     }
 
+    function update() {
+        if (!busy) radioReader.running = true
+    }
 
-    // =========================================================
-    // STATE CHANGE DETECTION
-    // =========================================================
+    function toggle() {
+        if (busy || !available) return
+        error = ""
+        wifiToggle.command = ["nmcli", "-w", "3", "radio", "wifi", enabled ? "off" : "on"]
+        wifiToggle.running = true
+    }
+
+    Timer {
+        interval: 5000
+        running: true
+        repeat: true
+        onTriggered: root.update()
+    }
+    Component.onCompleted: update()
 
     function handleStateChange() {
 
@@ -226,122 +201,4 @@ Singleton {
     }
 
 
-    // =========================================================
-    // POLLING
-    // =========================================================
-
-    Timer {
-
-        interval: 5000
-
-        running: true
-        repeat: true
-
-        onTriggered: {
-            root.update()
-        }
-    }
-
-
-    // =========================================================
-    // UPDATE
-    // =========================================================
-
-    function update() {
-
-        wifiReader.running = false
-        wifiReader.running = true
-    }
-
-
-    // =========================================================
-    // TOGGLE WIFI
-    // =========================================================
-
-    function toggle() {
-
-        wifiToggle.running = false
-
-
-        if (connected) {
-
-            connected = false
-            connecting = false
-
-            strength = 0
-            ssid = ""
-
-            wifiToggle.command = [
-                "nmcli",
-                "radio",
-                "wifi",
-                "off"
-            ]
-
-        } else {
-
-            connected = false
-            connecting = true
-
-            strength = 0
-            ssid = ""
-
-            wifiToggle.command = [
-                "nmcli",
-                "radio",
-                "wifi",
-                "on"
-            ]
-        }
-
-
-        updateIcon()
-
-        wifiToggle.running = true
-    }
-
-
-    // =========================================================
-    // ICON
-    // =========================================================
-
-    function updateIcon() {
-
-        if (!connected) {
-
-            icon = "󰤮"
-
-            return
-        }
-
-
-        if (strength >= 80)
-            icon = "󰤨"
-
-        else if (strength >= 60)
-            icon = "󰤥"
-
-        else if (strength >= 40)
-            icon = "󰤢"
-
-        else if (strength >= 20)
-            icon = "󰤟"
-
-        else
-            icon = "󰤯"
-    }
-
-
-    // =========================================================
-    // STARTUP
-    // =========================================================
-
-    Component.onCompleted: {
-
-        console.log(
-            "WifiService loaded"
-        )
-
-        update()
-    }
 }

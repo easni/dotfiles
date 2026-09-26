@@ -115,17 +115,17 @@ Item {
 
     Component {
         id: controlCenterView
-        ControlCenterView { }
+        ControlCenterView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {
         id: themeSelectorView
-        ThemeSelectorView { }
+        ThemeSelectorView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {
         id: wallpaperSelectorView
-        WallpaperSelectorView { }
+        WallpaperSelectorView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {

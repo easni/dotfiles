@@ -178,6 +178,21 @@ Without the daemon, the Wallpaper Selector will still display your wallpapers, b
 
 ## Theme Synchronization (Optional)
 
+Theme selection always updates Luci and saves the selection. Startup and QML
+reload restore only Luci's colors; an invalid saved theme falls back to Monochrome.
+External synchronization is disabled by default. Set any of these environment
+variables to `1` in the environment that launches Quickshell to opt in:
+
+- `LUCI_SYNC_WALLPAPER=1`: apply the selected theme's wallpaper when it exists.
+- `LUCI_SYNC_HYPRLAND=1`: update the theme symlink described below.
+- `LUCI_SYNC_KITTY=1`: generate `~/.config/kitty/luci-colors.conf` (respects
+  `XDG_CONFIG_HOME`). Add `include luci-colors.conf` to your Kitty configuration
+  to use it. Only color settings are emitted; `kitty.conf` is never replaced.
+
+For example, launch with `LUCI_SYNC_WALLPAPER=1 qs -c ~/.config/quickshell`.
+These options apply when selecting a theme, not when restoring it at startup.
+
+
 By default, Luci only changes its own appearance.
 
 If you want Luci to also update **Hyprland's appearance** (borders, gaps, rounding, blur, shadows, opacity, etc.), your Hyprland configuration **must be modular**.
@@ -218,7 +233,7 @@ hyprctl reload
 
 ### First Theme Switch
 
-The first time you switch a theme from Luci, it automatically creates:
+With `LUCI_SYNC_HYPRLAND=1`, the first time you switch a theme from Luci it creates:
 
 ```text
 ~/.config/hypr/current-theme/theme.lua
@@ -230,7 +245,7 @@ Until this first theme switch happens, Hyprland may report an error because `cur
 
 This is expected.
 
-Simply open the Theme Selector and switch to any theme once. Luci will automatically create the required symbolic link and the error will disappear.
+Enable `LUCI_SYNC_HYPRLAND=1`, then open the Theme Selector and switch to any theme once. Luci will automatically create the required symbolic link and the error will disappear.
 
 After that, every theme change will automatically update Hyprland's appearance.
 
@@ -284,7 +299,7 @@ Simply replace the filenames with wallpapers that exist in your own `~/Pictures/
 
 ### Automatic Theme Wallpapers
 
-When switching themes, Luci can also automatically change your wallpaper.
+With `LUCI_SYNC_WALLPAPER=1`, switching themes can also change your wallpaper.
 
 The default wallpaper for each theme is configured in:
 
@@ -306,7 +321,7 @@ If these files are left unchanged:
 
 * **All** wallpapers will continue to work normally.
 * The **Theme** button may not display any wallpapers for your themes.
-* Automatic wallpaper switching will reference wallpaper filenames that don't exist on your system.
+* Missing automatic theme wallpapers are skipped.
 
 ## Using Luci
 
@@ -431,7 +446,7 @@ last ten seconds. Hover to pause the preview and its notification timeout.
 Click the card to open notification history, or use the close button to dismiss
 it. Opening history does not pin the control center: it closes when the pointer
 leaves, returning to an already-pinned expanded island when applicable. Clicking
-an empty area toggles pinning; action buttons do not pin panels. You can also use
+the empty control-center header toggles pinning; action buttons do not pin panels. You can also use
 the control center's close button to return to the clock.
 
 During a burst, the newest notification is shown with a count of other unread
@@ -574,3 +589,25 @@ python3 ~/.config/quickshell/tests/run_calendar_tests.py
 The calendar tests use a private session bus, disposable config, and fixture
 `dcal` executable. Screenshots and logs are saved to
 `/tmp/quickshell-calendar-tests`.
+
+## Control regression tests
+
+Run `python3 ~/.config/quickshell/tests/run_polish_tests.py` to check slider
+bindings and rapid changes, theme fallback and safe synchronization, disconnected
+Wi-Fi toggling, narrow panels, and combined pointer/keyboard theme selection.
+The tests use fake hardware commands, a temporary home and a private D-Bus session.
+Screenshots and logs are saved in `/tmp/luci-polish-tests`.
+
+### Audio output routing
+
+Volume controls and both visualizers follow the system default output. Moving
+only an application's playback stream to another speaker does not change that
+default. In your audio settings, make the desired speaker the default/fallback
+output as well. The visualizers reconnect when the default output changes,
+including disconnect/reconnect transitions, and the volume display refreshes.
+
+For an opt-in check against actual playback, run
+`python3 ~/.config/quickshell/tests/check_live_audio.py`. It checks both visualizer
+feeds and reconnection, briefly lowers the default output by one percentage point,
+and restores its volume. This check requires audio to be playing and accesses
+your live audio session; it is separate from the isolated test suites.

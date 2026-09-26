@@ -37,6 +37,7 @@ Item {
             var value = Number(parts[1])
 
             if (type === "volume") {
+                AudioService.update()
 
                 if (value === -1) {
 
@@ -76,6 +77,7 @@ Item {
             }
 
             else if (type === "brightness") {
+                BrightnessService.update()
 
                 var icon
 

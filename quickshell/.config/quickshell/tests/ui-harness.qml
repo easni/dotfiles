@@ -44,6 +44,7 @@ ShellRoot {
             Island {
                 id: capsule
                 availableWidth: window.width - 20
+                availableHeight: window.height - 40
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 20
             }
