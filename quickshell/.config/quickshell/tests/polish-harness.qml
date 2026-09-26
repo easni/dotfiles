@@ -78,11 +78,27 @@ ShellRoot {
 
             until(() => WifiService.available && !WifiService.busy, "Wi-Fi unavailable")
             check(WifiService.enabled && !WifiService.connected, "Expected disconnected radio on")
+            WifiService.connected = true
+            WifiService.ssid = "Previously connected"
             WifiService.toggle()
+            for (let i = 0; i < 6; ++i) {
+                wait(100)
+                check(WifiService.connecting && !WifiService.displayEnabled
+                    && WifiService.subtitle === "Turning off…", "Off transition flashed stale state")
+            }
             until(() => !WifiService.busy && !WifiService.enabled, "Disconnected radio did not turn off")
             WifiService.toggle()
+            for (let i = 0; i < 6; ++i) {
+                wait(100)
+                check(WifiService.connecting && WifiService.displayEnabled
+                    && WifiService.subtitle === "Turning on…", "On transition flashed stale state")
+            }
             until(() => !WifiService.busy && WifiService.enabled, "Radio did not turn on")
             check(!WifiService.connecting && WifiService.subtitle === "Not connected", "Wi-Fi stuck connecting")
+            WifiService.toggle()
+            until(() => !WifiService.busy && WifiService.error !== "", "Failed Wi-Fi command did not finish")
+            check(WifiService.displayEnabled && WifiService.enabled, "Failed toggle did not restore highlight")
+            console.log("PASS delayed Wi-Fi transitions and failed-toggle rollback")
 
             for (const entry of [[controls, "controls-narrow"], [themes, "themes-narrow"], [wallpapers, "wallpapers-narrow"]]) {
                 panel.sourceComponent = entry[0]

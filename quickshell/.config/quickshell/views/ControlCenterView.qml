@@ -75,7 +75,7 @@ Item {
 
                     subtitle: WifiService.subtitle
 
-                    active: WifiService.enabled
+                    active: WifiService.displayEnabled
                     enabled: WifiService.available && !WifiService.busy
 
                     onClicked: WifiService.toggle()

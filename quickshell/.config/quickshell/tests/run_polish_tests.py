@@ -35,8 +35,18 @@ def read(key, default):
 def write(key, value): (root/key).write_text(value)
 if name == 'nmcli':
     if args[-1] in ('on','off'):
-        write('radio', 'enabled' if args[-1]=='on' else 'disabled')
-    elif 'radio' in args: print(read('radio','enabled'))
+        count=int(read('toggles','0'))+1
+        write('toggles',str(count))
+        if count==3: sys.exit(1)
+        write('radio-pending',('enabled' if args[-1]=='on' else 'disabled')+'|'+str(time.time()+.9))
+    elif 'radio' in args:
+        pending=read('radio-pending','')
+        if pending:
+            target,deadline=pending.split('|')
+            if time.time()>=float(deadline):
+                write('radio',target)
+                write('radio-pending','')
+        print(read('radio','enabled'))
     else: print('no:50:Test network')
 elif name == 'wpctl':
     if args[0]=='set-volume':

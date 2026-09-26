@@ -9,21 +9,26 @@ Singleton {
 
     property bool enabled: false
     property bool connected: false
-    readonly property bool connecting: wifiToggle.running
-    readonly property bool busy: radioReader.running || wifiReader.running || wifiToggle.running
+    // Keep an operation pending until a fresh read confirms its outcome.
+    property int pendingRadio: -1
+    readonly property bool connecting: pendingRadio !== -1
+    readonly property bool processBusy: radioReader.running || wifiReader.running || wifiToggle.running
+    readonly property bool busy: connecting || processBusy
+    readonly property bool displayEnabled: connecting ? pendingRadio === 1 : enabled
+    property bool settling: false
     property bool available: false
     property string error: ""
     property int strength: 0
     property string ssid: ""
     readonly property string subtitle: error !== "" ? error
-        : connecting ? "Updating…"
+        : connecting ? (pendingRadio === 1 ? "Turning on…" : "Turning off…")
         : !available ? "Unavailable"
         : !enabled ? "Off"
         : connected ? ssid : "Not connected"
     readonly property string icon: !connected ? "󰤮"
         : strength >= 80 ? "󰤨" : strength >= 60 ? "󰤥"
         : strength >= 40 ? "󰤢" : strength >= 20 ? "󰤟" : "󰤯"
-    readonly property url svgIcon: Qt.resolvedUrl(enabled
+    readonly property url svgIcon: Qt.resolvedUrl(displayEnabled
         ? "../assets/icons/wifi.svg" : "../assets/icons/wifi-off.svg")
 
     property bool initialized: false
@@ -38,14 +43,20 @@ Singleton {
         onExited: function(code) {
             const state = radioOutput.text.trim()
             root.available = code === 0 && (state === "enabled" || state === "disabled")
-            if (!root.available) return
+            if (!root.available) {
+                root.finishToggle("Could not read Wi-Fi state")
+                return
+            }
             root.enabled = state === "enabled"
+            // A successful command can precede NetworkManager's state change.
+            if (root.connecting && root.enabled !== (root.pendingRadio === 1)) return
             if (root.enabled) wifiReader.running = true
             else {
                 root.connected = false
                 root.ssid = ""
                 root.strength = 0
                 root.handleStateChange()
+                root.finishToggle("")
             }
         }
     }
@@ -58,6 +69,7 @@ Singleton {
         onExited: function(code) {
             if (code !== 0) {
                 root.available = false
+                root.finishToggle("Could not read Wi-Fi state")
                 return
             }
             const line = wifiOutput.text.split("\n").find(line => line.startsWith("yes:")) || ""
@@ -66,30 +78,52 @@ Singleton {
             root.strength = root.connected ? Number(parts[1]) : 0
             root.ssid = root.connected ? parts.slice(2).join(":").replace(/\\(.)/g, "$1") : ""
             root.handleStateChange()
+            root.finishToggle("")
         }
     }
 
     Process {
         id: wifiToggle
         onExited: function(code) {
-            root.error = code === 0 ? "" : "Could not change Wi-Fi"
+            if (code !== 0) root.finishToggle("Could not change Wi-Fi")
             root.update()
         }
     }
 
     function update() {
-        if (!busy) radioReader.running = true
+        if (!processBusy) radioReader.running = true
     }
 
     function toggle() {
         if (busy || !available) return
         error = ""
+        pendingRadio = enabled ? 0 : 1
+        operationTimeout.restart()
         wifiToggle.command = ["nmcli", "-w", "3", "radio", "wifi", enabled ? "off" : "on"]
         wifiToggle.running = true
     }
 
+    function finishToggle(message) {
+        if (!connecting) return
+        if (pendingRadio === 1 && !message) { settling = true; settleTimer.restart() }
+        operationTimeout.stop()
+        pendingRadio = -1
+        error = message
+    }
+
+    Timer { id: settleTimer; interval: 10000; onTriggered: root.settling = false }
     Timer {
-        interval: 5000
+        id: operationTimeout
+        interval: 10000
+        onTriggered: {
+            root.finishToggle("Wi-Fi change timed out. Retry.")
+            if (wifiToggle.running) wifiToggle.signal(9)
+            if (radioReader.running) radioReader.signal(9)
+            if (wifiReader.running) wifiReader.signal(9)
+        }
+    }
+    Timer {
+        interval: root.connecting || root.settling ? 500 : 5000
         running: true
         repeat: true
         onTriggered: root.update()
