@@ -9,7 +9,7 @@ local state = {
   augroup = vim.api.nvim_create_augroup('custom-zen-mode', { clear = true }),
 }
 
-local ZEN_WIDTH = 83
+local ZEN_WIDTH = 84
 
 local function valid_win(win)
   return win and vim.api.nvim_win_is_valid(win)
