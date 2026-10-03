@@ -20,11 +20,12 @@ PanelWindow {
 
         onCleared: {
             if (IslandState.launcher) LauncherController.close()
+            else if (IslandState.mode === IslandState.calendarMode) IslandController.closeCalendar()
             else if (IslandState.modal) IslandController.reset()
         }
     }
 
-    focusable: focusGrab.active
+    focusable: focusGrab.active || (ThemeService.ready && IslandState.mode === IslandState.bluetoothMode)
 
     anchors {
         top: true

@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
-THEME="$1"
+set -euo pipefail
+
+THEME="${1:-}"
+CONFIG_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+USER_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 if [[ -z "$THEME" ]]; then
     echo "Usage: theme-switch.sh <theme>"
     exit 1
 fi
 
-THEMES_DIR="$HOME/.config/quickshell/styles/themes"
+[[ "$THEME" =~ ^[a-z0-9]+$ ]] || { echo "Invalid theme name" >&2; exit 1; }
+THEMES_DIR="$CONFIG_DIR/styles/themes"
 THEME_DIR="$THEMES_DIR/$THEME"
 
 if [[ ! -d "$THEME_DIR" ]]; then
@@ -90,31 +95,21 @@ esac
 # Wallpaper
 # -------------------------
 
-awww img \
-"$HOME/Pictures/wallpapers/$WP" \
---transition-type grow
-
-# -------------------------
-# Kitty
-# -------------------------
-
-if [[ -f "$THEME_DIR/kitty.conf" ]]; then
-    cp -f \
-        "$THEME_DIR/kitty.conf" \
-        "$HOME/.config/kitty/kitty.conf"
-
-    echo "✓ kitty.conf"
+# External changes are opt-in. Restoring the shell theme never invokes this script.
+if [[ "${LUCI_SYNC_WALLPAPER:-0}" == 1 && -f "$HOME/Pictures/wallpapers/$WP" ]]; then
+    awww img "$HOME/Pictures/wallpapers/$WP" --transition-type grow || echo "Could not apply wallpaper" >&2
 fi
 
-# -------------------------
-# Hyprland
-# -------------------------
+# Generate a palette include, never replace the user's kitty.conf.
+if [[ "${LUCI_SYNC_KITTY:-0}" == 1 && -f "$THEME_DIR/kitty.conf" ]]; then
+    mkdir -p "$USER_CONFIG_DIR/kitty"
+    awk '$1 ~ /^(background|foreground|selection_background|selection_foreground|cursor|cursor_text_color|active_tab_background|active_tab_foreground|inactive_tab_background|inactive_tab_foreground|color[0-9]+)$/ { print }' \
+        "$THEME_DIR/kitty.conf" > "$USER_CONFIG_DIR/kitty/luci-colors.conf"
+fi
 
-link_if_exists \
-    "$THEME_DIR/HyprTheme.lua" \
-    "$HOME/.config/hypr/current-theme/theme.lua"
+if [[ "${LUCI_SYNC_HYPRLAND:-0}" == 1 ]]; then
+    link_if_exists "$THEME_DIR/HyprTheme.lua" "$USER_CONFIG_DIR/hypr/current-theme/theme.lua"
+fi
 
-echo
-
-echo "$THEME" > "$HOME/.config/quickshell/.current_theme"
-
+printf '%s\n' "$THEME" > "$CONFIG_DIR/.current_theme.tmp"
+mv -- "$CONFIG_DIR/.current_theme.tmp" "$CONFIG_DIR/.current_theme"

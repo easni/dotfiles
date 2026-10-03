@@ -30,6 +30,17 @@ Singleton {
     readonly property int playbackPlaying: 1
     readonly property int playbackPaused: 2
 
+    function updatePosition(rawPosition) {
+        position = Number.isFinite(rawPosition) ? Math.max(0, Math.floor(rawPosition)) : 0
+    }
+
+    function updateLength(rawLength) {
+
+        // Quickshell falls back to position when the player has no duration.
+        length = player && player.lengthSupported &&
+            Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 0
+    }
+
     function updatePlayer() {
 
         if (Mpris.players.values.length === 0) {
@@ -47,8 +58,7 @@ Singleton {
             return
         }
 
-        if (player !== Mpris.players.values[0])
-            player = Mpris.players.values[0]
+        player = Mpris.players.values[0]
 
         title = player.trackTitle
         artist = player.trackArtist
@@ -59,11 +69,8 @@ Singleton {
 
         isPlaying = player.playbackState === playbackPlaying
 
-        position = player.position
-
-        if (player.length > position + 5)
-            length = player.length
-
+        updatePosition(player.position)
+        updateLength(player.length)
     }
 
     function formatTime(seconds) {
@@ -115,11 +122,12 @@ Singleton {
 
         function onTrackTitleChanged() {
             root.title = player.trackTitle
-            root.length = 0
+            root.updateLength(player.length)
         }
 
         function onTrackArtistChanged() {
             root.artist = player.trackArtist
+            root.updateLength(player.length)
         }
 
         function onTrackArtUrlChanged() {
@@ -134,7 +142,7 @@ Singleton {
         }
 
         function onPositionChanged() {
-            root.position = player.position
+            root.updatePosition(player.position)
         }
 
         function onLengthChanged() {
@@ -142,8 +150,11 @@ Singleton {
             if (!player)
                 return
 
-            if (player.length > root.position + 5)
-                root.length = player.length
+            root.updateLength(player.length)
+        }
+
+        function onLengthSupportedChanged() {
+            root.updateLength(player.length)
         }
     }
 

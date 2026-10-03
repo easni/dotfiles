@@ -11,6 +11,7 @@ import "../styles/themes/monochrome" as Dark
 
 ShellRoot {
     id: testRoot
+    IslandIPC { }
     function findItem(item, name) {
         if (!item.visible) return null
         if (item.objectName === name) return item
@@ -43,6 +44,7 @@ ShellRoot {
             Island {
                 id: capsule
                 availableWidth: window.width - 20
+                availableHeight: window.height - 40
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 20
             }

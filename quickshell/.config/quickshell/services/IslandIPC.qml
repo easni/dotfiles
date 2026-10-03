@@ -2,9 +2,12 @@ import Quickshell
 import Quickshell.Io
 
 import "../core"
+import "../island"
 
 IpcHandler {
     target: "luci"
+
+    function openBluetooth() { IslandController.openBluetooth() }
 
     function openAppLauncher() { LauncherController.openApps() }
     function openClipboard() { LauncherController.openClipboard() }
@@ -14,7 +17,8 @@ IpcHandler {
     }
 
     function openPowerMenu() {
-        IslandController.openPowerMenu()
+        if (IslandState.mode === IslandState.powerMenuMode) IslandController.reset()
+        else IslandController.openPowerMenu()
     }
 
     function openExpandedHome() {
@@ -26,10 +30,12 @@ IpcHandler {
     }
 
     function openWallpaperSelector() {
-        IslandController.openWallpaperSelector()
+        if (IslandState.mode === IslandState.wallpaperSelectorMode) IslandController.reset()
+        else IslandController.openWallpaperSelector()
     }
 
     function openThemeSelector() {
-        IslandController.openThemeSelector()
+        if (IslandState.mode === IslandState.themeSelectorMode) IslandController.reset()
+        else IslandController.openThemeSelector()
     }
 }

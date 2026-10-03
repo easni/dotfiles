@@ -83,5 +83,24 @@ try:
     s=ipc('state'); assert s['width']<=300,s
     ipc('grab',str(ROOT/'preview-narrow.png')); time.sleep(.3)
     print('PASS narrow-screen preview width',flush=True)
+    ipc('quiet', 'true'); ipc('reset')
+    def shortcut(method):
+        subprocess.check_output(['qs', 'ipc', '-p', str(CONFIG), 'call', 'luci', method],
+                                text=True, stderr=subprocess.STDOUT)
+    menus = [('openPowerMenu', 2), ('openThemeSelector', 4), ('openWallpaperSelector', 5)]
+    for method, mode in menus:
+        shortcut(method)
+        s=ipc('state'); assert s['mode']==mode,s
+        shortcut(method)
+        s=ipc('state'); assert s['mode']==0 and not s['pinned'],s
+        shortcut(method)
+        s=ipc('state'); assert s['mode']==mode,s
+        ipc('reset')
+    for method, mode in menus:
+        shortcut(method)
+        s=ipc('state'); assert s['mode']==mode,s
+    shortcut('openWallpaperSelector')
+    s=ipc('state'); assert s['mode']==0,s
+    print('PASS power, theme and wallpaper IPC shortcuts toggle and switch panels',flush=True)
 finally:
     p.terminate(); p.wait(timeout=5); log.close()

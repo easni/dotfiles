@@ -32,6 +32,7 @@ Singleton {
         stdout: StdioCollector {
 
             onStreamFinished: {
+                if (setProcess.running || root.pendingValue >= 0) return
 
                 let output = this.text.trim()
 
@@ -45,32 +46,32 @@ Singleton {
 
     Process {
         id: setProcess
-
         onExited: {
-            root.update()
+            if (root.pendingValue >= 0) root.flushValue()
+            else root.update()
         }
+
     }
 
     function update() {
 
-        queryProcess.running = false
-        queryProcess.running = true
+        if (!queryProcess.running)
+            queryProcess.running = true
     }
 
+    property int pendingValue: -1
+
     function setBrightness(value) {
+        pendingValue = Math.max(0, Math.min(100, Math.round(value)))
+        brightness = pendingValue
+        flushValue()
+    }
 
-        let percent = Math.round(value)
-
-        let scriptPath =
-            String(
-                Qt.resolvedUrl("../scripts/brightness.sh")
-            ).replace("file://", "")
-
-        setProcess.command = [
-            scriptPath,
-            percent + "%"
-        ]
-
+    function flushValue() {
+        if (setProcess.running || pendingValue < 0) return
+        const percent = pendingValue
+        pendingValue = -1
+        setProcess.command = [String(Qt.resolvedUrl("../scripts/brightness.sh")).replace("file://", ""), percent + "%"]
         setProcess.running = true
     }
 
@@ -93,7 +94,7 @@ Singleton {
     }
 
     Timer {
-        interval: 100
+        interval: 1000
         repeat: true
         running: true
 

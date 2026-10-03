@@ -3,10 +3,19 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 
 Singleton {
 
     id: root
+
+    Connections {
+        target: Pipewire
+        function onDefaultAudioSinkChanged() {
+            root.pendingValue = -1
+            root.update()
+        }
+    }
 
     property int volume: 0
     property bool muted: false
@@ -29,14 +38,13 @@ Singleton {
         id: queryProcess
 
         command: [
-            "sh",
-            "-c",
-            "wpctl get-volume @DEFAULT_AUDIO_SINK@"
+            "wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"
         ]
 
         stdout: StdioCollector {
 
             onStreamFinished: {
+                if (setProcess.running || root.pendingValue >= 0) return
 
                 let output = this.text.trim()
 
@@ -58,43 +66,54 @@ Singleton {
 
     Process {
         id: setProcess
+        onExited: {
+            if (root.pendingValue >= 0) root.flushValue()
+            else root.update()
+        }
     }
 
     function update() {
 
-        queryProcess.running = false
-        queryProcess.running = true
+        if (!queryProcess.running)
+            queryProcess.running = true
     }
 
+    property int pendingValue: -1
+
     function setVolume(value) {
+        pendingValue = Math.max(0, Math.min(100, Math.round(value)))
+        volume = pendingValue
+        flushValue()
+    }
 
-        let percent = Math.round(value)
-
-        setProcess.command = [
-            "wpctl",
-            "set-volume",
-            "@DEFAULT_AUDIO_SINK@",
-            percent + "%"
-        ]
-
+    function flushValue() {
+        if (setProcess.running || pendingValue < 0) return
+        const percent = pendingValue
+        pendingValue = -1
+        setProcess.command = ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", percent + "%"]
         setProcess.running = true
     }
 
-    function toggleMute() {
+    Process {
+        id: muteProcess
+        onExited: root.update()
+    }
 
-        setProcess.command = [
+    function toggleMute() {
+        if (muteProcess.running) return
+        muteProcess.command = [
             "wpctl",
             "set-mute",
             "@DEFAULT_AUDIO_SINK@",
             "toggle"
         ]
 
-        setProcess.running = true
+        muteProcess.running = true
     }
 
     Timer {
 
-        interval: 100
+        interval: 1000
         repeat: true
         running: true
 

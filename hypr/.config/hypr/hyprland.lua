@@ -94,7 +94,7 @@ hl.config({
 
         -- Change transparency of focused and unfocused windows
         active_opacity   = 1.0,
-        inactive_opacity = 1.0,
+        inactive_opacity = 0.9,
 
         -- shadow = {
         --     enabled      = true,
@@ -107,7 +107,7 @@ hl.config({
             enabled   = true,
             size      = 3,
             passes    = 1,
-            vibrancy  = 0.1696,
+            vibrancy  = 0.2,
         },
     },
 
@@ -241,10 +241,29 @@ hl.config({
     },
 })
 
--- Sensitivity for the specific red wireless mouse
+-- Sensitivity for the specific logitech red wireless mouse
 hl.device({
     name = "logitech-m310-1",
     sensitivity = -0.75,
+})
+
+-- Settings for the logitech mx master 3s
+hl.device({
+    name = "logitech-usb-receiver-mouse",
+    sensitivity = -0.85,
+    natural_scroll = true,
+})
+
+hl.bind("mouse:277", hl.dsp.exec_cmd("notify-send 'thumb button pressed'"))
+
+-- Settings for apple magic trackpad
+hl.device({
+    name = "apple-inc.-magic-trackpad",
+    sensitivity = 0.1,
+    natural_scroll = true,
+    scroll_factor = 0.25,
+    tap_and_drag = false,
+    accel_profile = "adaptive",
 })
 
 hl.gesture({

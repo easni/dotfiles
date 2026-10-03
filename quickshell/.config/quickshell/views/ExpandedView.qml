@@ -27,7 +27,7 @@ Item {
         }
 
         Item {
-            width: 520 - 130 - 90 - 28
+            width: parent.width - 130 - 130
             height: parent.height
 
             CenterSection {
@@ -39,7 +39,7 @@ Item {
 
         RightSection {
 
-            width: 90
+            width: 130
 
             anchors.verticalCenter: parent.verticalCenter
 

@@ -1,0 +1,20 @@
+solaar version 1.1.20
+
+Bolt Receiver
+  Device path  : /dev/hidraw3
+  USB id       : 046d:C548
+  Serial       : TEST-RECEIVER
+  Has 2 paired device(s) out of a maximum of 6.
+
+  1: MX Keys S
+     Kind         : keyboard
+     Serial number: TEST-KEYBOARD
+                 1: BL1 88.02.B0017
+         8: UNIFIED BATTERY        {1004} V3
+            Battery: 35%, BatteryStatus.DISCHARGING.
+     Battery: 35%, BatteryStatus.DISCHARGING.
+
+  2: MX Master 3S
+     Kind         : mouse
+     Serial number: TEST-MOUSE
+     Battery: 55%, BatteryStatus.DISCHARGING.

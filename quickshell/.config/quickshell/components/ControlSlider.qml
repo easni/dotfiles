@@ -9,6 +9,15 @@ Rectangle {
     property url iconSource: ""
 
     property real value: 0.5
+    property real dragValue: value
+    readonly property real displayValue: Math.max(0, Math.min(1, pointer.pressed ? dragValue : value))
+    property string label: ""
+    Accessible.name: label
+    Accessible.role: Accessible.Slider
+    activeFocusOnTab: true
+
+    Keys.onLeftPressed: valueChangedByUser(Math.max(0, value - 0.05))
+    Keys.onRightPressed: valueChangedByUser(Math.min(1, value + 0.05))
 
     signal valueChangedByUser(real value)
 
@@ -20,8 +29,8 @@ Rectangle {
     color: Theme.surface
 
     Rectangle {
-        width: root.value > 0
-            ? Math.max(parent.height, parent.width * root.value)
+        width: root.displayValue > 0
+            ? Math.max(parent.height, parent.width * root.displayValue)
             : 0
 
         height: parent.height
@@ -61,6 +70,7 @@ Rectangle {
     }
 
     MouseArea {
+        id: pointer
         anchors.fill: parent
 
         cursorShape: Qt.PointingHandCursor
@@ -89,7 +99,7 @@ Rectangle {
                     )
                 )
 
-            root.value = newValue
+            root.dragValue = newValue
 
             root.valueChangedByUser(newValue)
         }

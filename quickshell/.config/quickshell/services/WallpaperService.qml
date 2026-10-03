@@ -43,7 +43,7 @@ Singleton {
 
         command: [
             "cat",
-            Quickshell.env("HOME") + "/.config/quickshell/assets/wallpapers.json"
+            Quickshell.shellPath("assets/wallpapers.json")
         ]
 
         stdout: StdioCollector {

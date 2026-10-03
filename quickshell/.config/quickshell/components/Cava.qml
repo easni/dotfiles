@@ -38,7 +38,10 @@ Item {
 
                 radius: width / 2
 
-                anchors.bottom: parent.bottom
+                anchors.verticalCenter: parent.verticalCenter
+                // Keep fractional heights symmetric around the shared center.
+                anchors.alignWhenCentered: false
+                antialiasing: true
 
                 color: Theme.textPrimary
 
