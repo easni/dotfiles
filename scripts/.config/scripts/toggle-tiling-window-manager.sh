@@ -23,7 +23,7 @@ if [ -f "$STATE_FILE" ]; then
 
   # Start borders (adjust path if 'borders' isn't in your $PATH)
   # borders active_color=0xffeb212e inactive_color=0x00000000 width=5.0 &
-  borders &
+  # borders &
   sketchybar &
 
   rm "$STATE_FILE"
@@ -31,7 +31,7 @@ if [ -f "$STATE_FILE" ]; then
 else
   # --- TURN EVERYTHING OFF ---
   aerospace enable off
-  pkill -x borders
+  # pkill -x borders
   pkill -x sketchybar
   touch "$STATE_FILE"
   echo "AeroSpace & Sketchybar: OFF"

@@ -47,6 +47,8 @@ exec-on-workspace-change = [
   '-c',
   'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
 ]
+
+# on-focus-changed = ['move-mouse window-lazy-center', 'exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
 on-focus-changed = ['exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
@@ -164,15 +166,18 @@ A = 'LG HDR 4K'
     ctrl-alt-cmd-9 = 'workspace 9'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    ctrl-alt-cmd-shift-1 = 'move-node-to-workspace 1'
-    ctrl-alt-cmd-shift-2 = 'move-node-to-workspace 2'
-    ctrl-alt-cmd-shift-3 = 'move-node-to-workspace 3'
-    ctrl-alt-cmd-shift-4 = 'move-node-to-workspace 4'
-    ctrl-alt-cmd-shift-5 = 'move-node-to-workspace 5'
-    ctrl-alt-cmd-shift-6 = 'move-node-to-workspace 6'
-    ctrl-alt-cmd-shift-7 = 'move-node-to-workspace 7'
-    ctrl-alt-cmd-shift-8 = 'move-node-to-workspace 8'
-    ctrl-alt-cmd-shift-9 = 'move-node-to-workspace 9'
+    ctrl-alt-cmd-shift-1 = 'move-node-to-workspace 1 --focus-follows-window'
+    ctrl-alt-cmd-shift-2 = 'move-node-to-workspace 2 --focus-follows-window'
+    ctrl-alt-cmd-shift-3 = 'move-node-to-workspace 3 --focus-follows-window'
+    ctrl-alt-cmd-shift-4 = 'move-node-to-workspace 4 --focus-follows-window'
+    ctrl-alt-cmd-shift-5 = 'move-node-to-workspace 5 --focus-follows-window'
+    ctrl-alt-cmd-shift-6 = 'move-node-to-workspace 6 --focus-follows-window'
+    ctrl-alt-cmd-shift-7 = 'move-node-to-workspace 7 --focus-follows-window'
+    ctrl-alt-cmd-shift-8 = 'move-node-to-workspace 8 --focus-follows-window'
+    ctrl-alt-cmd-shift-9 = 'move-node-to-workspace 9 --focus-follows-window'
+
+    # keybinds from my hyprland config
+    ctrl-alt-cmd-z = ['fullscreen'] #, 'exec-and-forget sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE']
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     # alt-tab = 'workspace-back-and-forth'
@@ -201,12 +206,9 @@ A = 'LG HDR 4K'
   if.window-title-regex-substring = 'Accounts'
   run = 'layout floating'
 
-  # A very janky way to yank mini browser windows back to the current workspace. Only outlook links need this.
-  # [[on-window-detected]]
-  # if.app-id = 'company.thebrowser.Browser'
-  # if.window-title-regex-substring = '^(?!(Personal|Choate|Space 1)$).+'
-  # run = 'exec-and-forget win_id="$(aerospace list-windows --focused --format "%{window-id}")"; sleep 1; aerospace workspace-back-and-forth; sleep 1; aerospace move-node-to-workspace --window-id "$win_id" --focus-follows-window "$(aerospace list-workspaces --focused)"'
-  # run = 'exec-and-forget win_id="$(aerospace list-windows --focused --format "%{window-id}")"; sleep 0.1; aerospace layout --window-id "$win_id" floating; aerospace workspace-back-and-forth; aerospace move-node-to-workspace --window-id "$win_id" --focus-follows-window "$(aerospace list-workspaces --focused)"'
+  [focus-follows-mouse]
+  enabled = true
+
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -223,9 +225,6 @@ A = 'LG HDR 4K'
     ctrl-alt-cmd-shift-j = ['join-with down', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
     ctrl-alt-cmd-shift-k = ['join-with up', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
     ctrl-alt-cmd-shift-l = ['join-with right', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-
-
-    z = ['fullscreen', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change'] #, 'exec-and-forget sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE']
 
     space = ['exec-and-forget nowplaying-cli togglePlayPause', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
     l = ['exec-and-forget nowplaying-cli next', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
