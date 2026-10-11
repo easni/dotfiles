@@ -518,11 +518,6 @@ do
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
-
-
-  vim.pack.add { gh "chomosuke/typst-preview.nvim" }
-  vim.pack.add { gh "christoomey/vim-tmux-navigator" }
-  vim.pack.add { gh "iamcco/markdown-preview.nvim" } -- Run vim.fn["mkdp#util#install"]() to complete the installation
 end
 
 -- ============================================================
