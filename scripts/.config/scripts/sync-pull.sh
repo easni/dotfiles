@@ -42,9 +42,20 @@ snapshot_file="$temporary_dir/repository/snapshot.tar.gz.age"
 
 # Authenticate and decrypt fully in temporary storage before touching either
 # the destination or its backups.
+# Filter metadata from older snapshots as well as from new local backups.
+tar_options=(
+  --no-xattrs
+  '--exclude=.[Dd][Ss]_[Ss][Tt][Oo][Rr][Ee]'
+  '--exclude=._*'
+)
+# COPYFILE_DISABLE alone does not stop bsdtar from restoring AppleDouble
+# metadata in old archives. GNU tar does not support this option.
+if [[ "$(tar --version)" == bsdtar* ]]; then
+  tar_options+=(--no-mac-metadata)
+fi
 mkdir -p -- "$temporary_dir/extracted"
 age --decrypt -i "$SYNC_KEY_FILE" "$snapshot_file" | \
-  tar -xzf - -C "$temporary_dir/extracted"
+  tar "${tar_options[@]}" -xzf - -C "$temporary_dir/extracted"
 pulled_commit=$(git -C "$temporary_dir/repository" rev-parse HEAD)
 
 # Save the current local contents only after the remote snapshot has downloaded.
@@ -52,7 +63,7 @@ pulled_commit=$(git -C "$temporary_dir/repository" rev-parse HEAD)
 if (( SYNC_BACKUP_KEEP > 0 )) && [[ -d "$SYNC_DIR" ]]; then
   mkdir -p -- "$SYNC_BACKUP_DIR"
   backup_file="$SYNC_BACKUP_DIR/backup-$(date -u '+%Y%m%dT%H%M%SZ')-$$.tar.gz"
-  tar -czf "$backup_file" -C "$SYNC_DIR" .
+  tar "${tar_options[@]}" -czf "$backup_file" -C "$SYNC_DIR" .
 
   shopt -s nullglob
   backups=("$SYNC_BACKUP_DIR"/backup-*.tar.gz)
@@ -63,7 +74,9 @@ if (( SYNC_BACKUP_KEEP > 0 )) && [[ -d "$SYNC_DIR" ]]; then
 fi
 
 mkdir -p -- "$SYNC_DIR"
-rsync -a --delete --exclude='.git/' -- \
+# Excluded metadata stays local: do not copy or delete Finder's own files.
+rsync -a --delete --exclude='.git/' \
+  '--exclude=.[Dd][Ss]_[Ss][Tt][Oo][Rr][Ee]' '--exclude=._*' -- \
   "$temporary_dir/extracted/" "$SYNC_DIR/"
 
 state_dir=$(dirname -- "$SYNC_STATE_FILE")
