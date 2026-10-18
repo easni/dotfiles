@@ -69,7 +69,18 @@ trap 'rm -rf -- "$temporary_dir"' EXIT
 # Build an encrypted archive in a temporary repository, leaving the synced
 # folder clean and hiding both its contents and filenames from the remote.
 mkdir -p -- "$temporary_dir/repository"
-tar_options=(--no-xattrs)
+# tar does not honor Git ignore rules. Omit Finder metadata at every depth,
+# including existing AppleDouble files and case variants of .DS_Store.
+tar_options=(
+  --no-xattrs
+  '--exclude=.[Dd][Ss]_[Ss][Tt][Oo][Rr][Ee]'
+  '--exclude=._*'
+)
+# bsdtar handles AppleDouble metadata separately from ordinary xattrs.
+# GNU tar does not support this option.
+if [[ "$(tar --version)" == bsdtar* ]]; then
+  tar_options+=(--no-mac-metadata)
+fi
 if [[ "$IGNORE_LOCK_FILES" == "1" ]]; then
   tar_options+=(
     '--exclude=~$*'
