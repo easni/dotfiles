@@ -11,10 +11,38 @@ PanelWindow {
 
     visible: ThemeService.ready
 
+    readonly property bool modalOpen: ThemeService.ready && IslandState.modal
+
+    // Recreate the grab after Hyprland has focused the destination workspace.
+    // A grab can remain active even after a workspace switch steals its focus.
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event) {
+            if (root.modalOpen && (event.name === "workspacev2"
+                    || event.name === "focusedmonv2"
+                    || event.name === "activespecialv2")) {
+                focusGrab.active = false
+                restoreGrab.restart()
+            }
+        }
+    }
+
+    Timer {
+        id: restoreGrab
+        interval: 0
+        onTriggered: focusGrab.active = root.modalOpen
+    }
+
+    onModalOpenChanged: {
+        restoreGrab.stop()
+        focusGrab.active = modalOpen
+    }
+
     HyprlandFocusGrab {
         id: focusGrab
 
-        active: ThemeService.ready && IslandState.modal
+        active: root.modalOpen
 
         windows: [ root ]
 
@@ -25,7 +53,9 @@ PanelWindow {
         }
     }
 
-    focusable: focusGrab.active || (ThemeService.ready && IslandState.mode === IslandState.bluetoothMode)
+    // Exclusive layer focus conflicts with Hyprland's outside-click grab.
+    // Keep the window focusable while the grab is being renewed, too.
+    focusable: root.modalOpen || (ThemeService.ready && IslandState.mode === IslandState.bluetoothMode)
 
     anchors {
         top: true
