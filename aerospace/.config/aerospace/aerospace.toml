@@ -48,8 +48,8 @@ exec-on-workspace-change = [
   'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
 ]
 
-# on-focus-changed = ['move-mouse window-lazy-center', 'exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
-on-focus-changed = ['exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
+on-focus-changed = ['move-mouse window-lazy-center', 'exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
+# on-focus-changed = ['exec-and-forget sketchybar --trigger aerospace_focus_change'] # Mouse follows focused window and also update sketchybar
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
@@ -65,7 +65,7 @@ persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 # A callback that runs every time binding mode changes
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
-on-mode-changed = []
+on-mode-changed = ['exec-and-forget sketchybar --trigger aerospace_mode_change']
 
 # Force Workspace A to your vertical monitor
 [workspace-to-monitor-force-assignment]
@@ -185,8 +185,8 @@ A = 'LG HDR 4K'
     ctrl-alt-cmd-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
-    ctrl-alt-cmd-semicolon = ['mode service', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    # ctrl-alt-cmd-r = ['mode apps', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+    ctrl-alt-cmd-semicolon = ['mode service']
+    # ctrl-alt-cmd-r = ['mode apps']
 
     cmd-h = [] # Disable "hide application"
     cmd-alt-h = [] # Disable "hide others"
@@ -213,37 +213,37 @@ A = 'LG HDR 4K'
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
-    esc = ['reload-config', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    r = ['flatten-workspace-tree', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change'] # reset layout
-    f = ['layout floating tiling', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change'] # Toggle between floating and tiling layout
-    backspace = ['close-all-windows-but-current', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+    esc = ['reload-config', 'mode main']
+    r = ['flatten-workspace-tree', 'mode main'] # reset layout
+    f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
+    backspace = ['close-all-windows-but-current']
 
     # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
     #s = ['layout sticky tiling', 'mode main']
 
-    ctrl-alt-cmd-shift-h = ['join-with left', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    ctrl-alt-cmd-shift-j = ['join-with down', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    ctrl-alt-cmd-shift-k = ['join-with up', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    ctrl-alt-cmd-shift-l = ['join-with right', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+    ctrl-alt-cmd-shift-h = ['join-with left', 'mode main']
+    ctrl-alt-cmd-shift-j = ['join-with down', 'mode main']
+    ctrl-alt-cmd-shift-k = ['join-with up', 'mode main']
+    ctrl-alt-cmd-shift-l = ['join-with right', 'mode main']
 
-    space = ['exec-and-forget nowplaying-cli togglePlayPause', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    l = ['exec-and-forget nowplaying-cli next', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-    h = ['exec-and-forget nowplaying-cli previous', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+    space = ['exec-and-forget nowplaying-cli togglePlayPause', 'mode main']
+    l = ['exec-and-forget nowplaying-cli next', 'mode main']
+    h = ['exec-and-forget nowplaying-cli previous', 'mode main']
 
 
 [mode.apps.binding]
-  esc = ['mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+  esc = ['mode main']
 
-  a = ['exec-and-forget open /Applications/Safari.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  b = ['exec-and-forget open /Applications/Zen.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  c = ['exec-and-forget open /System/Applications/Calendar.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  f = ['exec-and-forget open /System/Library/CoreServices/Finder.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  i = ['exec-and-forget open -b com.adobe.InDesign', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  m = ['exec-and-forget open /System/Applications/Messages.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  n = ['exec-and-forget open /System/Applications/Notes.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  o = ['exec-and-forget open /Applications/Microsoft\ Outlook.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  r = ['exec-and-forget open /System/Applications/Reminders.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  # s = ['exec-and-forget open /Applications/sioyek.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  t = ['exec-and-forget open /Applications/Ghostty.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  w = ['exec-and-forget open /Applications/Microsoft\ Word.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
-  z = ['exec-and-forget open /Applications/Zotero.app', 'mode main', 'exec-and-forget sketchybar --trigger aerospace_mode_change']
+  a = ['exec-and-forget open /Applications/Safari.app', 'mode main']
+  b = ['exec-and-forget open /Applications/Zen.app', 'mode main']
+  c = ['exec-and-forget open /System/Applications/Calendar.app', 'mode main']
+  f = ['exec-and-forget open /System/Library/CoreServices/Finder.app', 'mode main']
+  i = ['exec-and-forget open -b com.adobe.InDesign', 'mode main']
+  m = ['exec-and-forget open /System/Applications/Messages.app', 'mode main']
+  n = ['exec-and-forget open /System/Applications/Notes.app', 'mode main']
+  o = ['exec-and-forget open /Applications/Microsoft\ Outlook.app', 'mode main']
+  r = ['exec-and-forget open /System/Applications/Reminders.app', 'mode main']
+  # s = ['exec-and-forget open /Applications/sioyek.app', 'mode main']
+  t = ['exec-and-forget open /Applications/Ghostty.app', 'mode main']
+  w = ['exec-and-forget open /Applications/Microsoft\ Word.app', 'mode main']
+  z = ['exec-and-forget open /Applications/Zotero.app', 'mode main']
