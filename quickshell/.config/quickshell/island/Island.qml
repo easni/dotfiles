@@ -4,6 +4,8 @@ import "../styles"
 import "../core"
 
 Rectangle {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property real availableWidth: 420
@@ -38,7 +40,7 @@ Rectangle {
         id: islandHover
 
         onHoveredChanged: {
-            NotificationController.hovered = hovered && NotificationController.visible
+            islandContext.notifications.hovered = hovered && islandContext.notifications.visible
             islandInteraction.handleHoverChanged(hovered)
         }
     }

@@ -8,6 +8,8 @@ import "../services"
 import "../styles"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     Component.onCompleted: {
@@ -241,7 +243,7 @@ FocusScope {
             break
 
         case Qt.Key_Escape:
-            IslandController.reset()
+            islandContext.navigation.reset()
             event.accepted = true
             break
 

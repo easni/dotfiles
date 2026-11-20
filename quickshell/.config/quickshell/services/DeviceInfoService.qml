@@ -3,10 +3,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../island"
+import "../core"
 
 Singleton {
     id: root
-    property bool active: IslandState.mode === IslandState.bluetoothMode
+    property bool active: IslandState.mode === IslandState.bluetoothMode || IslandRegistry.sessions.some(s => s.state.mode === s.state.bluetoothMode)
     property var devices: []
     property var outputs: []
     property string error: ""

@@ -11,7 +11,7 @@ import "../styles/themes/monochrome" as Dark
 
 ShellRoot {
     id: testRoot
-    IslandIPC { }
+    IslandIPC { targetSession: IslandRegistry.defaultContext }
     function findItem(item, name) {
         if (!item.visible) return null
         if (item.objectName === name) return item

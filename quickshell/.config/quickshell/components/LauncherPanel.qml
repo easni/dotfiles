@@ -6,6 +6,8 @@ import "../styles"
 import "../core"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     objectName: "launcherPanel"
     property string title: ""
@@ -61,7 +63,7 @@ FocusScope {
                 text: "×"
                 subtle: true
                 Accessible.name: "Close " + root.title
-                onClicked: LauncherController.close()
+                onClicked: islandContext.launcher.close()
             }
         }
         TextField {
@@ -87,7 +89,7 @@ FocusScope {
             Keys.priority: Keys.BeforeItem
             Keys.onPressed: event => {
                 const ctrl = event.modifiers & Qt.ControlModifier
-                if (event.key === Qt.Key_Escape) LauncherController.close()
+                if (event.key === Qt.Key_Escape) islandContext.launcher.close()
                 else if (ctrl && event.key === Qt.Key_W) {
                     if (search.selectionStart !== search.selectionEnd) {
                         search.remove(search.selectionStart, search.selectionEnd)

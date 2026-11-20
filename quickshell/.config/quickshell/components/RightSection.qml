@@ -6,6 +6,8 @@ import "../island"
 import "../services"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
 
     property Item batteryService
 
@@ -51,11 +53,11 @@ Item {
                     event.accepted = true
 
                     if (
-                        IslandState.mode === IslandState.controlCenterMode
+                        islandContext.state.mode === islandContext.state.controlCenterMode
                     )
                         return
 
-                    IslandController.openControlCenterFromRightSection()
+                    islandContext.navigation.openControlCenterFromRightSection()
                 }
             }
 

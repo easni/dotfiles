@@ -8,6 +8,8 @@ import "../styles"
 import "../core"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     property real availableWidth: 520
     property real availableHeight: 560
@@ -15,7 +17,7 @@ FocusScope {
     implicitHeight: Math.min(560, availableHeight)
     focus: true
     Component.onCompleted: forceActiveFocus()
-    Keys.onEscapePressed: IslandController.closeBluetooth()
+    Keys.onEscapePressed: islandContext.navigation.closeBluetooth()
 
     function symbol(kind) {
         return /keyboard/i.test(kind) ? "󰌌" : /mouse/i.test(kind) ? "󰍽"
@@ -30,7 +32,7 @@ FocusScope {
             NotificationButton {
                 text: "‹"
                 Accessible.name: "Back to control center"
-                onClicked: IslandController.closeBluetooth()
+                onClicked: islandContext.navigation.closeBluetooth()
             }
             Text {
                 Layout.fillWidth: true
@@ -43,12 +45,12 @@ FocusScope {
                 visible: NotificationService.unreadCount > 0
                 text: String(NotificationService.unreadCount)
                 Accessible.name: "Unread notifications"
-                onClicked: IslandController.openNotifications()
+                onClicked: islandContext.navigation.openNotifications()
             }
             NotificationButton {
                 text: "×"
                 Accessible.name: "Close devices"
-                onClicked: IslandController.reset()
+                onClicked: islandContext.navigation.reset()
             }
         }
         RowLayout {

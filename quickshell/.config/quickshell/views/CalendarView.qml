@@ -8,6 +8,8 @@ import "../core"
 import "../services/CalendarUtils.js" as Dates
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     property real availableWidth: 900
     property real availableHeight: 640
@@ -79,11 +81,11 @@ FocusScope {
         }
     }
     onVisibleRangeChanged: updateRange()
-    Component.onCompleted: { updateRange(); CalendarService.active = true; forceActiveFocus(); }
-    Component.onDestruction: CalendarService.active = false
+    Component.onCompleted: { updateRange(); CalendarService.viewers++; forceActiveFocus(); }
+    Component.onDestruction: CalendarService.viewers = Math.max(0, CalendarService.viewers - 1)
     Keys.onEscapePressed: event => {
         if (selectedEvent) selectedEvent = null;
-        else IslandController.closeCalendar();
+        else islandContext.navigation.closeCalendar();
         event.accepted = true;
     }
     Timer { interval: 30000; repeat: true; running: true; onTriggered: root.now = new Date() }
@@ -155,7 +157,7 @@ FocusScope {
                 anchors.verticalCenter: parent.verticalCenter
                 symbol: "\u00d7"
                 hint: "Close calendar"
-                onClicked: IslandController.closeCalendar()
+                onClicked: islandContext.navigation.closeCalendar()
             }
         }
         RowLayout {

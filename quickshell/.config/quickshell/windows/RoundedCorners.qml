@@ -3,9 +3,10 @@ import Quickshell
 import Quickshell.Wayland
 
 import "../components"
+import "../core"
 
 Variants {
-    model: Quickshell.screens
+    model: IslandRegistry.screens
 
     PanelWindow {
         id: root

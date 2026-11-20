@@ -8,6 +8,8 @@ import "../services"
 import "../styles"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property real availableWidth: 560
@@ -196,7 +198,7 @@ FocusScope {
 
         case Qt.Key_Escape:
 
-            IslandController.reset()
+            islandContext.navigation.reset()
 
             event.accepted = true
             break

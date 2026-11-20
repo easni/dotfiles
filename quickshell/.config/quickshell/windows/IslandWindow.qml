@@ -9,9 +9,11 @@ import "../services"
 PanelWindow {
     id: root
 
+    IslandSession { id: session; screenName: root.screen ? root.screen.name : "" }
+
     visible: ThemeService.ready
 
-    readonly property bool modalOpen: ThemeService.ready && IslandState.modal
+    readonly property bool modalOpen: ThemeService.ready && session.state.modal
 
     // Recreate the grab after Hyprland has focused the destination workspace.
     // A grab can remain active even after a workspace switch steals its focus.
@@ -47,15 +49,15 @@ PanelWindow {
         windows: [ root ]
 
         onCleared: {
-            if (IslandState.launcher) LauncherController.close()
-            else if (IslandState.mode === IslandState.calendarMode) IslandController.closeCalendar()
-            else if (IslandState.modal) IslandController.reset()
+            if (session.state.launcher) session.launcher.close()
+            else if (session.state.mode === session.state.calendarMode) session.navigation.closeCalendar()
+            else if (session.state.modal) session.navigation.reset()
         }
     }
 
     // Exclusive layer focus conflicts with Hyprland's outside-click grab.
     // Keep the window focusable while the grab is being renewed, too.
-    focusable: root.modalOpen || (ThemeService.ready && IslandState.mode === IslandState.bluetoothMode)
+    focusable: root.modalOpen || (ThemeService.ready && session.state.mode === session.state.bluetoothMode)
 
     anchors {
         top: true
@@ -71,6 +73,7 @@ PanelWindow {
 
     Island {
         id: capsule
+        islandContext: session
         availableWidth: Math.max(1, root.width - 20)
         availableHeight: root.screen ? Math.max(1, root.screen.height - 20) : 480
 

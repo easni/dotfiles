@@ -11,6 +11,7 @@ Singleton {
     property int liveCount: 0
     property bool hasExpiring: false
     property int pausedId: -1
+    property var pausedIds: []
     readonly property url defaultIcon: Qt.resolvedUrl("../assets/icons/bell.svg")
     signal arrived(var entry)
     signal entryClosed(int notificationId)
@@ -139,7 +140,7 @@ Singleton {
             previous = now
             for (const key of Object.keys(root.liveEntries)) {
                 const entry = root.liveEntries[key]
-                if (!entry || !entry.notification || entry.remaining <= 0 || entry.savedId === root.pausedId) continue
+                if (!entry || !entry.notification || entry.remaining <= 0 || (entry.savedId === root.pausedId || root.pausedIds.indexOf(entry.savedId) !== -1)) continue
                 entry.remaining -= elapsed
                 if (entry.remaining <= 0) entry.notification.expire()
             }

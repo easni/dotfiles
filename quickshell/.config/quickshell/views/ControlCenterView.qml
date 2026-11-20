@@ -9,6 +9,8 @@ import "../views"
 import "../services"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     clip: true
@@ -35,7 +37,7 @@ Item {
             text: "×"
             subtle: true
             Accessible.name: "Close control center"
-            onClicked: IslandController.reset()
+            onClicked: islandContext.navigation.reset()
         }
     }
 
@@ -93,7 +95,7 @@ Item {
 
                     active: BluetoothService.enabled
 
-                    onClicked: IslandController.openBluetooth()
+                    onClicked: islandContext.navigation.openBluetooth()
                 }
 
                 ControlCard {
@@ -153,7 +155,7 @@ Item {
                     active: MediaService.hasPlayer
 
                     onClicked: {
-                        IslandController.openMediaControls()
+                        islandContext.navigation.openMediaControls()
                     }
                 }
             }

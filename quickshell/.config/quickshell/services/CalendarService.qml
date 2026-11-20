@@ -8,7 +8,9 @@ Singleton {
     id: root
     // The desktop session's PATH does not include the locally installed IPC client.
     property string ipcExecutable: Quickshell.env("HOME") + "/.local/bin/dcal"
-    property bool active: false
+    // Views may overlap briefly while a modal moves between monitors.
+    property int viewers: 0
+    readonly property bool active: viewers > 0
     property var events: []
     property var calendars: []
     property bool loading: false

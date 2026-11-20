@@ -3,6 +3,8 @@ import QtQuick
 import "../core"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     anchors.fill: parent
@@ -13,13 +15,13 @@ Item {
 
         root.hovered = isHovered
 
-        if (NotificationController.visible) {
+        if (islandContext.notifications.visible) {
             expandTimer.stop()
             collapseTimer.stop()
             return
         }
 
-        if (IslandState.modal)
+        if (islandContext.state.modal)
             return
 
         if (isHovered) {
@@ -27,9 +29,9 @@ Item {
             collapseTimer.stop()
 
             if (
-                IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode ||
-                IslandState.mode === IslandState.bluetoothMode
+                islandContext.state.mode === islandContext.state.mediaControlsMode ||
+                islandContext.state.mode === islandContext.state.controlCenterMode ||
+                islandContext.state.mode === islandContext.state.bluetoothMode
             )
                 return
 
@@ -40,24 +42,24 @@ Item {
             expandTimer.stop()
 
             if (
-                IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode ||
-                IslandState.mode === IslandState.bluetoothMode
+                islandContext.state.mode === islandContext.state.mediaControlsMode ||
+                islandContext.state.mode === islandContext.state.controlCenterMode ||
+                islandContext.state.mode === islandContext.state.bluetoothMode
             ) {
 
-                if (!IslandState.islandPinned)
+                if (!islandContext.state.islandPinned)
                     collapseTimer.restart()
 
                 return
             }
 
-            if (!IslandState.islandPinned)
+            if (!islandContext.state.islandPinned)
                 collapseTimer.restart()
         }
     }
 
     Connections {
-        target: IslandState
+        target: islandContext.state
         function onModeChanged() {
             expandTimer.stop()
             collapseTimer.stop()
@@ -65,30 +67,30 @@ Item {
     }
 
     Connections {
-        target: NotificationController
+        target: islandContext.notifications
         function onVisibleChanged() {
-            if (NotificationController.visible) {
+            if (islandContext.notifications.visible) {
                 expandTimer.stop()
                 collapseTimer.stop()
-                NotificationController.hovered = root.hovered
+                islandContext.notifications.hovered = root.hovered
             }
         }
     }
 
     MouseArea {
-        enabled: !NotificationController.visible
+        enabled: !islandContext.notifications.visible
         anchors.fill: parent
 
         acceptedButtons: Qt.LeftButton
 
         onClicked: {
 
-            if (IslandState.modal || NotificationController.visible)
+            if (islandContext.state.modal || islandContext.notifications.visible)
                 return
 
-            if (IslandState.ignoreNextIslandTap) {
+            if (islandContext.state.ignoreNextIslandTap) {
 
-                IslandController.clearIgnoredTap()
+                islandContext.navigation.clearIgnoredTap()
 
                 expandTimer.stop()
                 collapseTimer.stop()
@@ -96,15 +98,15 @@ Item {
                 return
             }
 
-            IslandController.togglePin()
+            islandContext.navigation.togglePin()
 
-            if (IslandState.islandPinned) {
+            if (islandContext.state.islandPinned) {
 
                 expandTimer.stop()
                 collapseTimer.stop()
 
-                if (IslandState.mode === IslandState.defaultMode) {
-                    IslandController.openExpanded()
+                if (islandContext.state.mode === islandContext.state.defaultMode) {
+                    islandContext.navigation.openExpanded()
                 }
 
             } else {
@@ -123,16 +125,16 @@ Item {
 
         onTriggered: {
 
-            if (NotificationController.visible || IslandState.modal) return
+            if (islandContext.notifications.visible || islandContext.state.modal) return
 
             if (
-                IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode ||
-                IslandState.mode === IslandState.bluetoothMode
+                islandContext.state.mode === islandContext.state.mediaControlsMode ||
+                islandContext.state.mode === islandContext.state.controlCenterMode ||
+                islandContext.state.mode === islandContext.state.bluetoothMode
             )
                 return
 
-            IslandController.openExpanded()
+            islandContext.navigation.openExpanded()
         }
     }
 
@@ -144,27 +146,27 @@ Item {
 
         onTriggered: {
 
-            if (NotificationController.visible || IslandState.modal) return
+            if (islandContext.notifications.visible || islandContext.state.modal) return
 
             if (
-                IslandState.mode === IslandState.mediaControlsMode ||
-                IslandState.mode === IslandState.controlCenterMode ||
-                IslandState.mode === IslandState.bluetoothMode
+                islandContext.state.mode === islandContext.state.mediaControlsMode ||
+                islandContext.state.mode === islandContext.state.controlCenterMode ||
+                islandContext.state.mode === islandContext.state.bluetoothMode
             ) {
 
-                if (IslandState.returnToExpanded) {
+                if (islandContext.state.returnToExpanded) {
 
-                    IslandController.restoreExpanded()
+                    islandContext.navigation.restoreExpanded()
 
                 } else {
 
-                    IslandController.reset()
+                    islandContext.navigation.reset()
                 }
 
                 return
             }
 
-            IslandController.reset()
+            islandContext.navigation.reset()
         }
     }
 }

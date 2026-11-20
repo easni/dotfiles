@@ -5,6 +5,8 @@ import "../services"
 import "../core"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property int selectedIndex: 0
@@ -17,11 +19,11 @@ FocusScope {
     }
 
     function lock() {
-        PowerService.lockAfterIslandCollapse()
+        PowerService.lockAfterIslandCollapse(islandContext.navigation)
     }
 
     function suspend() {
-        PowerService.suspendAfterIslandCollapse()
+        PowerService.suspendAfterIslandCollapse(islandContext.navigation)
     }
 
     Keys.onPressed: function(event) {
@@ -73,7 +75,7 @@ FocusScope {
 
         case Qt.Key_Escape:
 
-            IslandController.reset()
+            islandContext.navigation.reset()
 
             event.accepted = true
             break

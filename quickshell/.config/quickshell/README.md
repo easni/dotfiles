@@ -635,3 +635,41 @@ reports are shown as unavailable, not zero. Receiver devices are read-only.
 Run `python3 tests/run_device_tests.py` from this configuration directory for
 isolated device, battery, audio-routing, navigation, and layout tests. The suite
 uses fake commands and devices and writes screenshots to `/tmp/luci-device-tests`.
+
+## Multiple monitors and reconnection
+
+Each connected monitor gets its own island, with independent navigation, pinning,
+selection, and hover state. Keyboard IPC shortcuts target Hyprland's focused
+monitor (falling back to an available monitor while focus information catches up).
+Pointer actions use the island on which they occur.
+
+Only one modal popup owns keyboard focus at a time. Opening a launcher, clipboard,
+calendar, theme/wallpaper picker, or power menu on another monitor closes the old
+modal, restoring its pinned return view where applicable. Non-modal pinned panels
+on other monitors remain open. Notifications appear on the focused monitor when
+its island is available; history and system services remain shared.
+
+Disconnecting a monitor destroys its island and releases its focus grab. Other
+monitors keep their state. Reconnecting creates a fresh compact island, including
+after all monitors have disappeared. Qt's unnamed placeholder screen and
+Hyprland's temporary `FALLBACK` output are excluded. Shortcuts do nothing while
+there are no usable outputs. Rounded corners follow the same screen list.
+
+Run the isolated multi-monitor state and lifecycle checks without extra hardware:
+
+```sh
+python3 tests/run_monitor_tests.py
+```
+
+For a real Wayland integration check on Hyprland:
+
+```sh
+python3 tests/run_wayland_monitor_tests.py --live-virtual-outputs
+```
+
+The latter briefly creates two virtual outputs and changes keyboard focus. Avoid
+typing during the test. It removes its outputs and restores the original monitor
+focus afterward; it never disconnects physical displays. It covers layer-window
+creation, popup focus routing, disconnect/reconnect, and popup toggling after
+reconnection. Physical cable/DPMS and graphics-driver failures still require
+hardware testing.

@@ -6,13 +6,15 @@ import "../components"
 import "../services"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property real availableWidth: 420
     property real availableHeight: 480
 
     implicitWidth: viewLoader.item ? viewLoader.item.implicitWidth : 0
-    readonly property bool showBadge: IslandState.mode !== IslandState.bluetoothMode && IslandState.mode !== IslandState.calendarMode && IslandState.mode !== IslandState.defaultMode && IslandState.mode !== IslandState.expandedMode && IslandState.mode !== IslandState.powerMenuMode && IslandState.mode !== IslandState.controlCenterMode && !NotificationController.visible && NotificationService.unreadCount > 0
+    readonly property bool showBadge: islandContext.state.mode !== islandContext.state.bluetoothMode && islandContext.state.mode !== islandContext.state.calendarMode && islandContext.state.mode !== islandContext.state.defaultMode && islandContext.state.mode !== islandContext.state.expandedMode && islandContext.state.mode !== islandContext.state.powerMenuMode && islandContext.state.mode !== islandContext.state.controlCenterMode && !islandContext.notifications.visible && NotificationService.unreadCount > 0
     implicitHeight: viewLoader.item ? viewLoader.item.implicitHeight : 0
 
     NotificationBadge {
@@ -32,42 +34,42 @@ Item {
         height: item ? item.implicitHeight : 0
 
         sourceComponent: {
-            if (NotificationController.visible) return notificationView
+            if (islandContext.notifications.visible) return notificationView
 
 
             if (
-                IslandState.mode === IslandState.defaultMode &&
+                islandContext.state.mode === islandContext.state.defaultMode &&
                 StatusManager.visible
             )
                 return overlayView
 
-            switch (IslandState.mode) {
-            case IslandState.bluetoothMode:
+            switch (islandContext.state.mode) {
+            case islandContext.state.bluetoothMode:
                 return bluetoothView
-            case IslandState.calendarMode:
+            case islandContext.state.calendarMode:
                 return calendarView
-            case IslandState.appLauncherMode:
+            case islandContext.state.appLauncherMode:
                 return appLauncherView
-            case IslandState.clipboardMode:
+            case islandContext.state.clipboardMode:
                 return clipboardView
 
 
-            case IslandState.expandedMode:
+            case islandContext.state.expandedMode:
                 return expandedView
 
-            case IslandState.powerMenuMode:
+            case islandContext.state.powerMenuMode:
                 return powerMenuView
 
-            case IslandState.controlCenterMode:
+            case islandContext.state.controlCenterMode:
                 return controlCenterView
 
-            case IslandState.themeSelectorMode:
+            case islandContext.state.themeSelectorMode:
                 return themeSelectorView
 
-            case IslandState.wallpaperSelectorMode:
+            case islandContext.state.wallpaperSelectorMode:
                 return wallpaperSelectorView
 
-            case IslandState.mediaControlsMode:
+            case islandContext.state.mediaControlsMode:
                 return mediaView
 
             default:

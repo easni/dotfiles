@@ -16,5 +16,6 @@ ShellRoot {
     IslandIPC {}
 
     RoundedCorners {}
-    IslandWindow {}
+    IslandWindows {}
+    Binding { target: NotificationService; property: "pausedIds"; value: IslandRegistry.pausedIds }
 }
