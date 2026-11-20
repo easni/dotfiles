@@ -1,3 +1,4 @@
+//@ pragma Env QT_IM_MODULES=fcitx;wayland
 import QtQuick
 import Quickshell
 import "windows"

@@ -67,7 +67,19 @@ PanelWindow {
 
     exclusiveZone: ThemeService.ready ? 33 : 0
 
-    implicitHeight: capsule.implicitHeight + 20
+    // Reuse space for the tallest view opened on this monitor. Resizing the
+    // Wayland buffer on the last animation frame can make the capsule jump.
+    // The input mask below still follows the visible capsule on every frame.
+    property int tallestView: 0
+    implicitHeight: Math.min(tallestView, capsule.availableHeight) + 20
+    Component.onCompleted: tallestView = Math.ceil(capsule.targetHeight)
+
+    Connections {
+        target: capsule
+        function onTargetHeightChanged() {
+            root.tallestView = Math.max(root.tallestView, Math.ceil(capsule.targetHeight))
+        }
+    }
 
     color: "transparent"
 

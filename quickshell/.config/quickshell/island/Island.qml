@@ -20,7 +20,8 @@ Rectangle {
     height: implicitHeight
 
     implicitWidth: viewHost.implicitWidth
-    implicitHeight: viewHost.implicitHeight
+    readonly property real targetHeight: viewHost.implicitHeight
+    implicitHeight: targetHeight
 
     Behavior on implicitWidth {
         NumberAnimation {
