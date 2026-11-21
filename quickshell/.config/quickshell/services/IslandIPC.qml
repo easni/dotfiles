@@ -1,41 +1,22 @@
 import Quickshell
 import Quickshell.Io
-
 import "../core"
-import "../island"
 
-IpcHandler {
-    target: "luci"
-
-    function openBluetooth() { IslandController.openBluetooth() }
-
-    function openAppLauncher() { LauncherController.openApps() }
-    function openClipboard() { LauncherController.openClipboard() }
-
-    function openNotifications() {
-        IslandController.openNotifications()
-    }
-
-    function openPowerMenu() {
-        if (IslandState.mode === IslandState.powerMenuMode) IslandController.reset()
-        else IslandController.openPowerMenu()
-    }
-
-    function openExpandedHome() {
-        IslandController.openExpanded()
-    }
-
-    function reset() {
-        IslandController.reset()
-    }
-
-    function openWallpaperSelector() {
-        if (IslandState.mode === IslandState.wallpaperSelectorMode) IslandController.reset()
-        else IslandController.openWallpaperSelector()
-    }
-
-    function openThemeSelector() {
-        if (IslandState.mode === IslandState.themeSelectorMode) IslandController.reset()
-        else IslandController.openThemeSelector()
+Scope {
+    id: root
+    property var targetSession: IslandRegistry.target
+    IpcHandler {
+        target: "luci"
+        function brightnessStep(amount: int) { root.targetSession?.displayBrightness.step(amount) }
+        function brightnessSet(percent: int) { root.targetSession?.displayBrightness.setBrightness(percent) }
+        function openBluetooth() { IslandRegistry.dispatch("openBluetooth", root.targetSession) }
+        function openAppLauncher() { IslandRegistry.dispatch("openAppLauncher", root.targetSession) }
+        function openClipboard() { IslandRegistry.dispatch("openClipboard", root.targetSession) }
+        function openNotifications() { IslandRegistry.dispatch("openNotifications", root.targetSession) }
+        function openPowerMenu() { IslandRegistry.dispatch("openPowerMenu", root.targetSession) }
+        function openExpandedHome() { IslandRegistry.dispatch("openExpandedHome", root.targetSession) }
+        function reset() { IslandRegistry.dispatch("reset", root.targetSession) }
+        function openWallpaperSelector() { IslandRegistry.dispatch("openWallpaperSelector", root.targetSession) }
+        function openThemeSelector() { IslandRegistry.dispatch("openThemeSelector", root.targetSession) }
     }
 }

@@ -8,6 +8,8 @@ import "../core"
 import "../services/CalendarUtils.js" as Dates
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     property real availableWidth: 900
     property real availableHeight: 640
@@ -79,13 +81,16 @@ FocusScope {
         }
     }
     onVisibleRangeChanged: updateRange()
-    Component.onCompleted: { updateRange(); CalendarService.active = true; forceActiveFocus(); }
-    Component.onDestruction: CalendarService.active = false
-    Keys.onEscapePressed: event => {
-        if (selectedEvent) selectedEvent = null;
-        else IslandController.closeCalendar();
-        event.accepted = true;
+    Component.onCompleted: { updateRange(); CalendarService.viewers++; forceActiveFocus(); }
+    Component.onDestruction: CalendarService.viewers = Math.max(0, CalendarService.viewers - 1)
+    EscapeKeyHandler {
+        id: escapeKey
+        onTriggered: {
+            if (root.selectedEvent) root.selectedEvent = null
+            else root.islandContext.navigation.closeCalendar()
+        }
     }
+    Keys.forwardTo: [escapeKey]
     Timer { interval: 30000; repeat: true; running: true; onTriggered: root.now = new Date() }
     Shortcut { sequence: "Left"; enabled: root.visible && root.mode !== "month" && !root.selectedEvent; onActivated: root.navigate(-1) }
     Shortcut { sequence: "Right"; enabled: root.visible && root.mode !== "month" && !root.selectedEvent; onActivated: root.navigate(1) }
@@ -155,7 +160,7 @@ FocusScope {
                 anchors.verticalCenter: parent.verticalCenter
                 symbol: "\u00d7"
                 hint: "Close calendar"
-                onClicked: IslandController.closeCalendar()
+                onClicked: islandContext.navigation.closeCalendar()
             }
         }
         RowLayout {

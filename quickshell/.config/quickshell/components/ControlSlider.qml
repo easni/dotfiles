@@ -8,6 +8,7 @@ Rectangle {
     property string icon: ""
     property url iconSource: ""
 
+    property bool commitOnRelease: false
     property real value: 0.5
     property real dragValue: value
     readonly property real displayValue: Math.max(0, Math.min(1, pointer.pressed ? dragValue : value))
@@ -80,6 +81,13 @@ Rectangle {
         }
 
 
+        onReleased: mouse => {
+            if (root.commitOnRelease) {
+                updateValue(mouse.x)
+                root.valueChangedByUser(root.dragValue)
+            }
+        }
+
         onPositionChanged: function(mouse) {
 
             if (pressed)
@@ -101,7 +109,7 @@ Rectangle {
 
             root.dragValue = newValue
 
-            root.valueChangedByUser(newValue)
+            if (!root.commitOnRelease) root.valueChangedByUser(newValue)
         }
     }
 }

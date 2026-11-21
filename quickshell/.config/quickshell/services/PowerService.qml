@@ -54,8 +54,8 @@ Singleton {
         hyprExec(Quickshell.shellPath("scripts/power-action.sh") + " lock")
     }
 
-    function lockAfterIslandCollapse() {
-        resetThenRun("lock")
+    function lockAfterIslandCollapse(navigation) {
+        resetThenRun("lock", navigation)
     }
 
     function logout() {
@@ -70,14 +70,14 @@ Singleton {
         hyprExec(Quickshell.shellPath("scripts/power-action.sh") + " suspend")
     }
 
-    function suspendAfterIslandCollapse() {
-        resetThenRun("suspend")
+    function suspendAfterIslandCollapse(navigation) {
+        resetThenRun("suspend", navigation)
     }
 
-    function resetThenRun(action) {
+    function resetThenRun(action, navigation = IslandController) {
         pendingAction = action
         delayedActionTimer.restart()
-        IslandController.reset()
+        navigation.reset()
     }
 
     function reboot() {

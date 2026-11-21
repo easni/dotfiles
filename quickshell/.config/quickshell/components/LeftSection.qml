@@ -4,6 +4,8 @@ import "../styles"
 import "../core"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property bool interactive: true
@@ -38,7 +40,7 @@ Item {
             onTapped: function(event) {
                 event.accepted = true
 
-                IslandController.openMediaFromLeftSection()
+                islandContext.navigation.openMediaFromLeftSection()
             }
         }
     }

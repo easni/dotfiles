@@ -16,6 +16,11 @@ Singleton {
     property int statusWidth: 160
     property int statusHeight: 33
 
+    function showBrightness(percent, title) {
+        show({mode: "brightness", icon: percent < 25 ? "󰃞" : percent < 60 ? "󰃟" : "󰃠",
+              title: title, value: percent, statusWidth: 300, statusHeight: 33})
+    }
+
     function show(data) {
 
         mode = data.mode

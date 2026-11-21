@@ -8,6 +8,8 @@ import "../styles"
 import "../core"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     property real availableWidth: 520
     property real availableHeight: 560
@@ -15,7 +17,11 @@ FocusScope {
     implicitHeight: Math.min(560, availableHeight)
     focus: true
     Component.onCompleted: forceActiveFocus()
-    Keys.onEscapePressed: IslandController.closeBluetooth()
+    EscapeKeyHandler {
+        id: escapeKey
+        onTriggered: root.islandContext.navigation.closeBluetooth()
+    }
+    Keys.forwardTo: [escapeKey]
 
     function symbol(kind) {
         return /keyboard/i.test(kind) ? "󰌌" : /mouse/i.test(kind) ? "󰍽"
@@ -30,7 +36,7 @@ FocusScope {
             NotificationButton {
                 text: "‹"
                 Accessible.name: "Back to control center"
-                onClicked: IslandController.closeBluetooth()
+                onClicked: islandContext.navigation.closeBluetooth()
             }
             Text {
                 Layout.fillWidth: true
@@ -43,12 +49,12 @@ FocusScope {
                 visible: NotificationService.unreadCount > 0
                 text: String(NotificationService.unreadCount)
                 Accessible.name: "Unread notifications"
-                onClicked: IslandController.openNotifications()
+                onClicked: islandContext.navigation.openNotifications()
             }
             NotificationButton {
                 text: "×"
                 Accessible.name: "Close devices"
-                onClicked: IslandController.reset()
+                onClicked: islandContext.navigation.reset()
             }
         }
         RowLayout {
@@ -62,8 +68,8 @@ FocusScope {
             }
             NotificationButton {
                 text: DeviceInfoService.loading ? "Loading…" : "Refresh"
-                enabled: !DeviceInfoService.loading && !DeviceInfoService.audioLoading
-                onClicked: { DeviceInfoService.refresh(); DeviceInfoService.refreshAudio() }
+                enabled: !DeviceInfoService.loading
+                onClicked: DeviceInfoService.refresh()
             }
         }
         ComboBox {
@@ -105,7 +111,6 @@ FocusScope {
                     model: BluetoothService.devices
                     delegate: DeviceRow {
                         required property var modelData
-                        readonly property var output: DeviceInfoService.outputFor(modelData.address)
                         Layout.fillWidth: true
                         Layout.minimumWidth: 0
                         Layout.preferredWidth: scroll.width
@@ -125,27 +130,9 @@ FocusScope {
                                 text: BluetoothService.busy(modelData) ? "Please wait…" : modelData.connected ? "Disconnect" : "Connect"
                                 enabled: !BluetoothService.busy(modelData) && !!modelData.adapter && modelData.adapter.enabled && !modelData.blocked
                                 onClicked: BluetoothService.toggleDevice(modelData)
-                            },
-                            NotificationButton {
-                                visible: modelData.connected && output !== null
-                                text: DeviceInfoService.audioAction === modelData.address ? "Switching…" : output && output.default ? "Use for audio ✓" : "Use for audio"
-                                enabled: !DeviceInfoService.audioLoading
-                                onClicked: DeviceInfoService.refreshAudio(modelData.address)
                             }
                         ]
                     }
-                }
-                Text {
-                    Layout.fillWidth: true
-                    visible: DeviceInfoService.audioError !== ""
-                    text: DeviceInfoService.audioError
-                    color: Theme.warning; font.pixelSize: 12; wrapMode: Text.Wrap
-                }
-                NotificationButton {
-                    visible: DeviceInfoService.audioError !== ""
-                    text: "Retry audio"
-                    enabled: !DeviceInfoService.audioLoading
-                    onClicked: DeviceInfoService.refreshAudio()
                 }
                 Text {
                     Layout.topMargin: 8

@@ -33,25 +33,26 @@ class DeviceInfoTests(unittest.TestCase):
         self.assertEqual(sleeping[0]['id'], devices[0]['id'])
         self.assertEqual(helper.parse_solaar('solaar version 1.1.20\n'), [])
 
-    def test_routing_identity_and_partial_failure(self):
-        sinks = [{'name':'bluez_output.AA_BB_CC_DD_EE_FF.1','index':10,'properties':{}},
-                 {'name':'same-display-name','index':11,'properties':{}}]
-        calls=[]
-        def fake(*args, **kwargs):
-            calls.append(args)
-            if args[-1]=='sinks': return json.dumps(sinks)
-            if args[-1]=='get-default-sink': return 'old'
-            if args[-1]=='sink-inputs': return json.dumps([{'index':5,'sink':9}])
-            if 'move-sink-input' in args: raise subprocess.CalledProcessError(1,args)
-            return ''
-        with patch.object(helper,'run',fake):
-            result=helper.audio_info('AA:BB:CC:DD:EE:FF')
-        self.assertIn('some apps',result['error'])
-        self.assertTrue(result['outputs'][0]['default'])
-        self.assertIn(('pactl','set-default-sink',sinks[0]['name']), calls)
-        self.assertFalse(any('volume' in ' '.join(c) for c in calls))
-        with patch.object(helper,'run',fake):
-            with self.assertRaisesRegex(ValueError,'no audio output'):
-                helper.audio_info('11:22:33:44:55:66')
+    def test_routing_and_partial_failure(self):
+        route_spec = importlib.util.spec_from_file_location('route_audio', root/'scripts/route-audio.py')
+        route = importlib.util.module_from_spec(route_spec)
+        route_spec.loader.exec_module(route)
+        for kind, stream_type in [('sink', 'sink-input'), ('source', 'source-output')]:
+            def fake(*args):
+                if args[-1] == kind + 's':
+                    return json.dumps([dict(name='headset', index=10), dict(name='speaker.monitor', index=11)])
+                if args[-1] == stream_type + 's':
+                    return json.dumps([{'index': 1, kind: 9}, {'index': 2, kind: 11}])
+                if args[0].startswith('move-'):
+                    raise subprocess.CalledProcessError(1, args)
+            with patch.object(route, 'pactl', side_effect=fake) as command:
+                with self.assertRaisesRegex(ValueError, 'some apps'):
+                    route.select(kind, 'headset')
+                command.assert_any_call('set-default-' + kind, 'headset')
+                command.assert_any_call('move-' + stream_type, '1', 'headset')
+                if kind == 'source':
+                    self.assertNotIn(unittest.mock.call('move-source-output', '2', 'headset'), command.call_args_list)
+                with self.assertRaisesRegex(ValueError, 'disconnected'):
+                    route.select(kind, 'unplugged')
 
 if __name__ == '__main__': unittest.main()

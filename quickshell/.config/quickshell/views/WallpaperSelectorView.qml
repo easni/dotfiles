@@ -8,6 +8,8 @@ import "../services"
 import "../styles"
 
 FocusScope {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     Component.onCompleted: {
@@ -221,6 +223,11 @@ FocusScope {
         }
     }
 
+    EscapeKeyHandler {
+        id: escapeKey
+        onTriggered: root.islandContext.navigation.reset()
+    }
+    Keys.forwardTo: [escapeKey]
     Keys.onPressed: function(event) {
         switch (event.key) {
 
@@ -238,11 +245,6 @@ FocusScope {
 
                 event.accepted = true
             }
-            break
-
-        case Qt.Key_Escape:
-            IslandController.reset()
-            event.accepted = true
             break
 
         case Qt.Key_H:

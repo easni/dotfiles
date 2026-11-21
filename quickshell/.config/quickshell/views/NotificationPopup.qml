@@ -4,6 +4,8 @@ import "../core"
 import "../services"
 
 Item {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
     property real availableWidth: 420
     implicitWidth: Math.max(1, Math.min(420, availableWidth))
@@ -13,11 +15,11 @@ Item {
         id: card
         width: root.implicitWidth
         height: implicitHeight
-        entry: NotificationController.current
+        entry: islandContext.notifications.current
         preview: true
-        moreUnread: NotificationController.moreUnread
-        onOpenRequested: NotificationController.openHistory()
-        onDismissRequested: NotificationController.dismiss()
+        moreUnread: islandContext.notifications.moreUnread
+        onOpenRequested: islandContext.notifications.openHistory()
+        onDismissRequested: islandContext.notifications.dismiss()
         onActionRequested: identifier => {
             if (entry) NotificationService.invoke(entry.savedId, identifier)
         }

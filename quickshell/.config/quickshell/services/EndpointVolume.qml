@@ -1,32 +1,26 @@
-pragma Singleton
 
 import QtQuick
 import Quickshell
 import Quickshell.Io
 
-Singleton {
+Scope {
 
     id: root
 
-    property int brightness: 0
-
-    readonly property url brightnessIcon: {
-
-        if (brightness <= 25)
-            return "../assets/icons/brightness-down.svg"
-
-        if (brightness <= 65)
-            return "../assets/icons/brightness-half.svg"
-
-        return "../assets/icons/brightness-full.svg"
+    required property string endpoint
+    function defaultChanged() {
+        pendingValue = -1
+        update()
     }
+
+    property int volume: 0
+    property bool muted: false
 
     Process {
         id: queryProcess
 
         command: [
-            "brightnessctl",
-            "info"
+            "wpctl", "get-volume", root.endpoint
         ]
 
         stdout: StdioCollector {
@@ -36,10 +30,18 @@ Singleton {
 
                 let output = this.text.trim()
 
-                let match = output.match(/\((\d+)%\)/)
+                if (output.length === 0)
+                    return
 
-                if (match)
-                    root.brightness = parseInt(match[1])
+                let parts = output.split(" ")
+
+                let value = parseFloat(parts[1])
+
+                if (!isNaN(value))
+                    root.volume = Math.round(value * 100)
+
+                root.muted =
+                    output.includes("[MUTED]")
             }
         }
     }
@@ -50,7 +52,6 @@ Singleton {
             if (root.pendingValue >= 0) root.flushValue()
             else root.update()
         }
-
     }
 
     function update() {
@@ -61,9 +62,9 @@ Singleton {
 
     property int pendingValue: -1
 
-    function setBrightness(value) {
+    function setVolume(value) {
         pendingValue = Math.max(0, Math.min(100, Math.round(value)))
-        brightness = pendingValue
+        volume = pendingValue
         flushValue()
     }
 
@@ -71,29 +72,29 @@ Singleton {
         if (setProcess.running || pendingValue < 0) return
         const percent = pendingValue
         pendingValue = -1
-        setProcess.command = [String(Qt.resolvedUrl("../scripts/brightness.sh")).replace("file://", ""), percent + "%"]
+        setProcess.command = ["wpctl", "set-volume", root.endpoint, percent + "%"]
         setProcess.running = true
     }
 
-    function increase(step) {
-
-        let amount = step === undefined ? 5 : step
-
-        setBrightness(
-            Math.min(100, brightness + amount)
-        )
+    Process {
+        id: muteProcess
+        onExited: root.update()
     }
 
-    function decrease(step) {
+    function toggleMute() {
+        if (muteProcess.running) return
+        muteProcess.command = [
+            "wpctl",
+            "set-mute",
+            root.endpoint,
+            "toggle"
+        ]
 
-        let amount = step === undefined ? 5 : step
-
-        setBrightness(
-            Math.max(0, brightness - amount)
-        )
+        muteProcess.running = true
     }
 
     Timer {
+
         interval: 1000
         repeat: true
         running: true

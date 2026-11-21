@@ -9,7 +9,7 @@ LauncherPanel {
     actionLabel: "Launch"
     results: AppLauncherService.search(query)
     busy: AppLauncherService.busy
-    error: AppLauncherService.errorSession === LauncherController.session ? AppLauncherService.error : ""
+    error: AppLauncherService.errorSession === islandContext.launcher.session ? AppLauncherService.error : ""
     emptyText: query.trim() ? "No applications match your search" : "No applications found"
-    onActivate: id => AppLauncherService.launch(id, LauncherController.session)
+    onActivate: id => AppLauncherService.launch(id, islandContext.launcher.session)
 }

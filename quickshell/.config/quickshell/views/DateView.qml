@@ -3,6 +3,8 @@ import "../styles"
 import "../core"
 
 Text {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: date
     objectName: "calendarDate"
 
@@ -16,7 +18,7 @@ Text {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: IslandController.openCalendar()
+        onClicked: islandContext.navigation.openCalendar()
     }
 
     Timer {

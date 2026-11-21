@@ -77,25 +77,7 @@ Item {
             }
 
             else if (type === "brightness") {
-                BrightnessService.update()
-
-                var icon
-
-                if (value < 25)
-                    icon = "󰃞"
-                else if (value < 60)
-                    icon = "󰃟"
-                else
-                    icon = "󰃠"
-
-                StatusManager.show({
-                    mode: "brightness",
-                    icon: icon,
-                    title: value + "%",
-                    value: value,
-                    statusWidth: 300,
-                    statusHeight: 33
-                })
+                StatusManager.showBrightness(value, value + "%")
             }
         }
     }

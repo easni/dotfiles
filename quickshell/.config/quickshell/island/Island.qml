@@ -4,10 +4,16 @@ import "../styles"
 import "../core"
 
 Rectangle {
+    property var islandContext: IslandRegistry.contextFor(parent)
+
     id: root
 
     property real availableWidth: 420
     property real availableHeight: 480
+    property alias contentVisible: viewHost.visible
+    property bool edgeHovered: false
+    readonly property bool pointerOverIsland: islandHover.hovered || edgeHovered
+    onPointerOverIslandChanged: islandInteraction.handleHoverChanged(pointerOverIsland)
 
     clip: true
 
@@ -18,7 +24,8 @@ Rectangle {
     height: implicitHeight
 
     implicitWidth: viewHost.implicitWidth
-    implicitHeight: viewHost.implicitHeight
+    readonly property real targetHeight: viewHost.implicitHeight
+    implicitHeight: targetHeight
 
     Behavior on implicitWidth {
         NumberAnimation {
@@ -38,8 +45,7 @@ Rectangle {
         id: islandHover
 
         onHoveredChanged: {
-            NotificationController.hovered = hovered && NotificationController.visible
-            islandInteraction.handleHoverChanged(hovered)
+            islandContext.notifications.hovered = hovered && islandContext.notifications.visible
         }
     }
 

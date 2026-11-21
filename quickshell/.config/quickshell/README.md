@@ -110,6 +110,9 @@ hl.bind(mainMod .. " + T",
 #### Volume & Brightness Notifications
 
 Luci displays temporary status notifications whenever your volume or brightness changes.
+Open **Brightness** in Control Center to adjust the monitor hosting that island. Brightness keys target
+the focused monitor. External displays use `ddcutil` and require DDC/CI access
+over the display cable. Built-in panels use `brightnessctl` with a backlight device.
 
 To enable this, route your multimedia keys through Luci's helper scripts.
 
@@ -621,9 +624,9 @@ behavior. Click empty header space to toggle pinning.
 
 Saved Bluetooth devices have Connect/Disconnect actions. The power button controls
 the selected adapter. Pairing, discovery, and device removal remain in your
-existing Bluetooth settings. Connected audio devices offer **Use for audio** to
-set the default output and move current playback streams without changing volume.
-Connecting a device alone does not change audio routing.
+existing Bluetooth settings. Open **Audio** in Control Center to choose the default output or microphone,
+adjust its level, or mute it. Selecting a device also moves existing compatible
+playback or recording streams. Click the song in the expanded island for media controls.
 
 The receiver section reads Logitech batteries using `solaar show` (tested with
 Solaar 1.1.20). Install the distribution's `solaar` package and its normal device
@@ -635,3 +638,41 @@ reports are shown as unavailable, not zero. Receiver devices are read-only.
 Run `python3 tests/run_device_tests.py` from this configuration directory for
 isolated device, battery, audio-routing, navigation, and layout tests. The suite
 uses fake commands and devices and writes screenshots to `/tmp/luci-device-tests`.
+
+## Multiple monitors and reconnection
+
+Each connected monitor gets its own island, with independent navigation, pinning,
+selection, and hover state. Keyboard IPC shortcuts target Hyprland's focused
+monitor (falling back to an available monitor while focus information catches up).
+Pointer actions use the island on which they occur.
+
+Only one modal popup owns keyboard focus at a time. Opening a launcher, clipboard,
+calendar, theme/wallpaper picker, or power menu on another monitor closes the old
+modal, restoring its pinned return view where applicable. Non-modal pinned panels
+on other monitors remain open. Notifications appear on the focused monitor when
+its island is available; history and system services remain shared.
+
+Disconnecting a monitor destroys its island and releases its focus grab. Other
+monitors keep their state. Reconnecting creates a fresh compact island, including
+after all monitors have disappeared. Qt's unnamed placeholder screen and
+Hyprland's temporary `FALLBACK` output are excluded. Shortcuts do nothing while
+there are no usable outputs. Rounded corners follow the same screen list.
+
+Run the isolated multi-monitor state and lifecycle checks without extra hardware:
+
+```sh
+python3 tests/run_monitor_tests.py
+```
+
+For a real Wayland integration check on Hyprland:
+
+```sh
+python3 tests/run_wayland_monitor_tests.py --live-virtual-outputs
+```
+
+The latter briefly creates two virtual outputs and changes keyboard focus. Avoid
+typing during the test. It removes its outputs and restores the original monitor
+focus afterward; it never disconnects physical displays. It covers layer-window
+creation, popup focus routing, disconnect/reconnect, and popup toggling after
+reconnection. Physical cable/DPMS and graphics-driver failures still require
+hardware testing.
