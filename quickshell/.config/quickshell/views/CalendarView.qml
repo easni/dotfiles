@@ -83,11 +83,14 @@ FocusScope {
     onVisibleRangeChanged: updateRange()
     Component.onCompleted: { updateRange(); CalendarService.viewers++; forceActiveFocus(); }
     Component.onDestruction: CalendarService.viewers = Math.max(0, CalendarService.viewers - 1)
-    Keys.onEscapePressed: event => {
-        if (selectedEvent) selectedEvent = null;
-        else islandContext.navigation.closeCalendar();
-        event.accepted = true;
+    EscapeKeyHandler {
+        id: escapeKey
+        onTriggered: {
+            if (root.selectedEvent) root.selectedEvent = null
+            else root.islandContext.navigation.closeCalendar()
+        }
     }
+    Keys.forwardTo: [escapeKey]
     Timer { interval: 30000; repeat: true; running: true; onTriggered: root.now = new Date() }
     Shortcut { sequence: "Left"; enabled: root.visible && root.mode !== "month" && !root.selectedEvent; onActivated: root.navigate(-1) }
     Shortcut { sequence: "Right"; enabled: root.visible && root.mode !== "month" && !root.selectedEvent; onActivated: root.navigate(1) }

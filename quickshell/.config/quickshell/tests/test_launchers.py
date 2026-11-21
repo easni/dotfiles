@@ -88,8 +88,14 @@ try:
     ipc('apps')
     ipc('pin'); ipc('apps'); ipc('query', 'alpha'); ipc('clipboard')
     wait_for(lambda s: s['mode'] == 8 and not s['loading'] and not s['query'], 'switching clears query')
-    ipc('key', 'escape')
+    ipc('key', 'escapeRelease')
+    assert ipc('state')['active'], 'a release without a matching press dismissed the picker'
+    ipc('key', 'escapePress')
+    state = ipc('state')
+    assert state['modal'] and state['focused'], 'picker handed off focus while Escape was held'
+    ipc('key', 'escapeRelease')
     state = ipc('state'); assert state['mode'] == 1 and state['pinned'], state
+    assert state['escapedKeys'] == 0, 'Escape propagated beyond the picker'
     print('PASS launcher switching preserves original pinned return state', flush=True)
 
     ipc('clipboard')

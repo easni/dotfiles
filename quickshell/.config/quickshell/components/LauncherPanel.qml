@@ -86,11 +86,15 @@ FocusScope {
                 border.width: 1
                 border.color: search.activeFocus ? Theme.accent : Theme.border
             }
+            EscapeKeyHandler {
+                id: escapeKey
+                onTriggered: root.islandContext.launcher.close()
+            }
+            Keys.forwardTo: [escapeKey]
             Keys.priority: Keys.BeforeItem
             Keys.onPressed: event => {
                 const ctrl = event.modifiers & Qt.ControlModifier
-                if (event.key === Qt.Key_Escape) islandContext.launcher.close()
-                else if (ctrl && event.key === Qt.Key_W) {
+                if (ctrl && event.key === Qt.Key_W) {
                     if (search.selectionStart !== search.selectionEnd) {
                         search.remove(search.selectionStart, search.selectionEnd)
                     } else {

@@ -17,7 +17,11 @@ FocusScope {
     implicitHeight: Math.min(560, availableHeight)
     focus: true
     Component.onCompleted: forceActiveFocus()
-    Keys.onEscapePressed: islandContext.navigation.closeBluetooth()
+    EscapeKeyHandler {
+        id: escapeKey
+        onTriggered: root.islandContext.navigation.closeBluetooth()
+    }
+    Keys.forwardTo: [escapeKey]
 
     function symbol(kind) {
         return /keyboard/i.test(kind) ? "󰌌" : /mouse/i.test(kind) ? "󰍽"

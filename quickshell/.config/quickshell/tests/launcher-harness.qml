@@ -27,6 +27,9 @@ ShellRoot {
         Item {
             id: canvas
             anchors.fill: parent
+            property int escapedKeys: 0
+            Keys.onPressed: event => { if (event.key === Qt.Key_Escape) escapedKeys++ }
+            Keys.onReleased: event => { if (event.key === Qt.Key_Escape) escapedKeys++ }
             Rectangle { anchors.fill: parent; color: "#252a33" }
             Island {
                 id: capsule
@@ -53,7 +56,8 @@ ShellRoot {
             if (name === "next") keys.keyClick(Qt.Key_N, Qt.ControlModifier)
             if (name === "previous") keys.keyClick(Qt.Key_P, Qt.ControlModifier)
             if (name === "enter") keys.keyClick(Qt.Key_Return)
-            if (name === "escape") keys.keyClick(Qt.Key_Escape)
+            if (name === "escapePress") keys.keyPress(Qt.Key_Escape)
+            if (name === "escapeRelease") keys.keyRelease(Qt.Key_Escape)
             if (name === "a") keys.keyClick(Qt.Key_A)
         }
         function activate() { root.findItem(capsule, "launcherPanel").activateSelection() }
@@ -62,7 +66,7 @@ ShellRoot {
             const input = root.findItem(capsule, "launcherSearch")
             return JSON.stringify({mode: IslandState.mode, modal: IslandState.modal, pinned: IslandState.islandPinned,
                 active: LauncherController.active, notificationPreview: NotificationController.visible, notifications: NotificationService.history.length, session: LauncherController.session,
-                width: capsule.width, height: capsule.height,
+                width: capsule.width, height: capsule.height, escapedKeys: canvas.escapedKeys,
                 query: input ? input.text : "", focused: input ? input.activeFocus : false,
                 selected: panel ? panel.selectedIndex : -1,
                 results: panel ? panel.results : [], loading: ClipboardService.loading,
