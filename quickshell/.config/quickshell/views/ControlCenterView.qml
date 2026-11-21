@@ -146,16 +146,16 @@ Item {
                 ControlCard {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
-                    iconSource: MediaService.icon
+                    iconSource: AudioService.volumeIcon
 
-                    title: "Media"
+                    title: "Audio"
 
-                    subtitle: MediaService.subtitle
+                    subtitle: "Output & input"
 
-                    active: MediaService.hasPlayer
+                    active: !AudioService.muted
 
                     onClicked: {
-                        islandContext.navigation.openMediaControls()
+                        islandContext.navigation.openAudio()
                     }
                 }
             }

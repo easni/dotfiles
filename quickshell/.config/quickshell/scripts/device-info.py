@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read receiver batteries or explicitly select a Bluetooth audio output."""
+"""Read receiver batteries."""
 import json
 import os
 import re
@@ -48,50 +48,9 @@ def receiver_info():
     return {'devices': parse_solaar(text), 'error': ''}
 
 
-def address(value):
-    return re.sub(r'[^0-9A-F]', '', value.upper())
-
-
-def sink_address(sink):
-    props = sink.get('properties', {})
-    for key in ('api.bluez5.address', 'device.string'):
-        candidate = props.get(key, '')
-        if re.fullmatch(r'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}', candidate):
-            return address(candidate)
-    match = re.match(r'^bluez_output\.([0-9a-fA-F_]{17})(?:\.|$)', sink.get('name', ''))
-    return address(match[1]) if match else ''
-
-
-def audio_info(target=None):
-    sinks = json.loads(run('pactl', '-f', 'json', 'list', 'sinks'))
-    default = run('pactl', 'get-default-sink').strip()
-    error = ''
-    if target:
-        matched = [s for s in sinks if sink_address(s) == address(target)]
-        if not matched:
-            raise ValueError('This device has no audio output yet. Try again after it connects.')
-        sink = next((s for s in matched if s['name'] == default), matched[0])
-        run('pactl', 'set-default-sink', sink['name'])
-        default = sink['name']
-        inputs = json.loads(run('pactl', '-f', 'json', 'list', 'sink-inputs'))
-        failures = []
-        for stream in inputs:
-            try:
-                run('pactl', 'move-sink-input', str(stream['index']), sink['name'])
-            except subprocess.CalledProcessError:
-                failures.append(stream['index'])
-        if failures:
-            remaining = {s['index'] for s in json.loads(run('pactl', '-f', 'json', 'list', 'sink-inputs'))
-                         if s['sink'] != sink['index']}
-            if remaining.intersection(failures):
-                error = 'Default output changed, but some apps could not be moved. Retry.'
-    return {'outputs': [{'address': sink_address(s), 'default': s['name'] == default}
-                        for s in sinks if sink_address(s)], 'error': error}
-
-
 def main():
     try:
-        result = receiver_info() if sys.argv[1] == 'receiver' else audio_info(sys.argv[2] if len(sys.argv) > 2 else None)
+        result = receiver_info()
     except FileNotFoundError as error:
         result = {'error': 'Install Solaar to read receiver batteries.' if error.filename == 'solaar' else 'Audio tools unavailable.'}
     except subprocess.TimeoutExpired:

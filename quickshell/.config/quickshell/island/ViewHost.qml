@@ -14,7 +14,7 @@ Item {
     property real availableHeight: 480
 
     implicitWidth: viewLoader.item ? viewLoader.item.implicitWidth : 0
-    readonly property bool showBadge: islandContext.state.mode !== islandContext.state.bluetoothMode && islandContext.state.mode !== islandContext.state.calendarMode && islandContext.state.mode !== islandContext.state.defaultMode && islandContext.state.mode !== islandContext.state.expandedMode && islandContext.state.mode !== islandContext.state.powerMenuMode && islandContext.state.mode !== islandContext.state.controlCenterMode && !islandContext.notifications.visible && NotificationService.unreadCount > 0
+    readonly property bool showBadge: !islandContext.state.devicePage && islandContext.state.mode !== islandContext.state.calendarMode && islandContext.state.mode !== islandContext.state.defaultMode && islandContext.state.mode !== islandContext.state.expandedMode && islandContext.state.mode !== islandContext.state.powerMenuMode && islandContext.state.mode !== islandContext.state.controlCenterMode && !islandContext.notifications.visible && NotificationService.unreadCount > 0
     implicitHeight: viewLoader.item ? viewLoader.item.implicitHeight : 0
 
     NotificationBadge {
@@ -44,6 +44,8 @@ Item {
                 return overlayView
 
             switch (islandContext.state.mode) {
+            case islandContext.state.audioMode:
+                return audioView
             case islandContext.state.bluetoothMode:
                 return bluetoothView
             case islandContext.state.calendarMode:
@@ -76,6 +78,11 @@ Item {
                 return defaultView
             }
         }
+    }
+
+    Component {
+        id: audioView
+        AudioView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {

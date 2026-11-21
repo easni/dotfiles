@@ -18,6 +18,8 @@ QtObject {
     readonly property int clipboardMode: 8
     readonly property int calendarMode: 9
     readonly property int bluetoothMode: 10
+    readonly property int audioMode: 11
+    readonly property bool devicePage: mode === bluetoothMode || mode === audioMode
 
     // =========================================================
     // STATE

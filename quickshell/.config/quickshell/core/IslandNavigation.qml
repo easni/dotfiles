@@ -13,23 +13,31 @@ QtObject {
     // Open a specific island view/mode.
     // =========================================================
 
-    property bool bluetoothReturnPinned: false
-    property bool bluetoothReturnExpanded: false
+    property bool deviceReturnPinned: false
+    property bool deviceReturnExpanded: false
 
     function openBluetooth() {
         if (root.state.mode === root.state.bluetoothMode) { closeBluetooth(); return }
-        ignoreNextIslandTap()
-        bluetoothReturnPinned = root.state.mode === root.state.controlCenterMode && root.state.islandPinned
-        bluetoothReturnExpanded = root.state.returnToExpanded || (root.state.mode === root.state.expandedMode && root.state.islandPinned)
-        root.state.returnToExpanded = bluetoothReturnExpanded
-        root.state.islandPinned = bluetoothReturnPinned
-        root.state.mode = root.state.bluetoothMode
+        openDevicePage(root.state.bluetoothMode)
     }
 
-    function closeBluetooth() {
+    function openAudio() { openDevicePage(root.state.audioMode) }
+
+    function openDevicePage(mode) {
         ignoreNextIslandTap()
-        root.state.islandPinned = bluetoothReturnPinned
-        root.state.returnToExpanded = bluetoothReturnExpanded
+        deviceReturnPinned = root.state.mode === root.state.controlCenterMode && root.state.islandPinned
+        deviceReturnExpanded = root.state.returnToExpanded || (root.state.mode === root.state.expandedMode && root.state.islandPinned)
+        root.state.returnToExpanded = deviceReturnExpanded
+        root.state.islandPinned = deviceReturnPinned
+        root.state.mode = mode
+    }
+
+    function closeBluetooth() { closeDevicePage() }
+
+    function closeDevicePage() {
+        ignoreNextIslandTap()
+        root.state.islandPinned = deviceReturnPinned
+        root.state.returnToExpanded = deviceReturnExpanded
         root.state.mode = root.state.controlCenterMode
     }
 

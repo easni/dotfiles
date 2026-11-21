@@ -621,9 +621,9 @@ behavior. Click empty header space to toggle pinning.
 
 Saved Bluetooth devices have Connect/Disconnect actions. The power button controls
 the selected adapter. Pairing, discovery, and device removal remain in your
-existing Bluetooth settings. Connected audio devices offer **Use for audio** to
-set the default output and move current playback streams without changing volume.
-Connecting a device alone does not change audio routing.
+existing Bluetooth settings. Open **Audio** in Control Center to choose the default output or microphone,
+adjust its level, or mute it. Selecting a device also moves existing compatible
+playback or recording streams. Click the song in the expanded island for media controls.
 
 The receiver section reads Logitech batteries using `solaar show` (tested with
 Solaar 1.1.20). Install the distribution's `solaar` package and its normal device

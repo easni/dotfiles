@@ -75,7 +75,7 @@ PanelWindow {
 
     // Exclusive layer focus conflicts with Hyprland's outside-click grab.
     // Keep the window focusable while the grab is being renewed, too.
-    focusable: root.modalOpen || (ThemeService.ready && session.state.mode === session.state.bluetoothMode)
+    focusable: root.modalOpen || (ThemeService.ready && session.state.devicePage)
 
     anchors {
         top: true
