@@ -110,7 +110,7 @@ hl.bind(mainMod .. " + T",
 #### Volume & Brightness Notifications
 
 Luci displays temporary status notifications whenever your volume or brightness changes.
-The Control Center brightness slider targets its own monitor. Brightness keys target
+Open **Brightness** in Control Center to adjust the monitor hosting that island. Brightness keys target
 the focused monitor. External displays use `ddcutil` and require DDC/CI access
 over the display cable. Built-in panels use `brightnessctl` with a backlight device.
 

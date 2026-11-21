@@ -19,7 +19,8 @@ QtObject {
     readonly property int calendarMode: 9
     readonly property int bluetoothMode: 10
     readonly property int audioMode: 11
-    readonly property bool devicePage: mode === bluetoothMode || mode === audioMode
+    readonly property int brightnessMode: 12
+    readonly property bool devicePage: mode === bluetoothMode || mode === audioMode || mode === brightnessMode
 
     // =========================================================
     // STATE

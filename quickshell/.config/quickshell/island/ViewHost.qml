@@ -44,6 +44,8 @@ Item {
                 return overlayView
 
             switch (islandContext.state.mode) {
+            case islandContext.state.brightnessMode:
+                return brightnessView
             case islandContext.state.audioMode:
                 return audioView
             case islandContext.state.bluetoothMode:
@@ -78,6 +80,11 @@ Item {
                 return defaultView
             }
         }
+    }
+
+    Component {
+        id: brightnessView
+        BrightnessView { availableWidth: root.availableWidth; availableHeight: root.availableHeight }
     }
 
     Component {

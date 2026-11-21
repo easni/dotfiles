@@ -21,6 +21,8 @@ QtObject {
         openDevicePage(root.state.bluetoothMode)
     }
 
+    function openBrightness() { openDevicePage(root.state.brightnessMode) }
+
     function openAudio() { openDevicePage(root.state.audioMode) }
 
     function openDevicePage(mode) {

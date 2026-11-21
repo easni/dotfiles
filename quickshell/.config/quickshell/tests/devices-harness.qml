@@ -115,6 +115,12 @@ ShellRoot {
             island.availableWidth = 520
             keyClick(Qt.Key_Escape)
             check(IslandState.mode === 3, "Escape from audio")
+            IslandController.openBrightness()
+            wait(350)
+            check(IslandState.mode === IslandState.brightnessMode && IslandState.islandPinned, "Pinned brightness page")
+            check(Math.abs(island.width - 520) < 0.1, "Brightness matches Audio width")
+            keyClick(Qt.Key_Escape)
+            check(IslandState.mode === 3 && IslandState.islandPinned, "Escape from brightness restores pin")
             IslandController.openBluetooth()
             wait(300)
             mouseMove(canvas, 310, 70)

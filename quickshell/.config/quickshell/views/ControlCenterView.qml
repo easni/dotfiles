@@ -14,14 +14,6 @@ Item {
     id: root
 
     readonly property var displayBrightness: islandContext.displayBrightness ?? null
-    onDisplayBrightnessChanged: displayBrightness?.update()
-    Timer {
-        interval: 10000
-        running: !!root.displayBrightness
-        repeat: true
-        onTriggered: root.displayBrightness.update()
-    }
-
     clip: true
     
     property real availableWidth: 520
@@ -64,7 +56,7 @@ Item {
         ColumnLayout {
             id: content
             width: scroll.width
-            height: Math.max(scroll.height, controlGrid.implicitHeight + 264)
+            height: Math.max(scroll.height, controlGrid.implicitHeight + spacing + notifications.Layout.minimumHeight)
             spacing: 18
 
             GridLayout {
@@ -111,15 +103,10 @@ Item {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
 
-                    iconSource: MicrophoneService.icon
-
-                    title: "Microphone"
-
-                    subtitle: MicrophoneService.subtitle
-
-                    active: !MicrophoneService.muted
-
-                    onClicked: MicrophoneService.toggle()
+                    iconSource: root.displayBrightness?.brightnessIcon ?? "../assets/icons/brightness-half.svg"
+                    title: "Brightness"
+                    subtitle: root.displayBrightness?.available ? root.displayBrightness.brightness + "%" : "Display"
+                    onClicked: islandContext.navigation.openBrightness()
                 }
 
                 ControlCard {
@@ -161,60 +148,14 @@ Item {
 
                     subtitle: "Output & input"
 
-                    active: !AudioService.muted
-
                     onClicked: {
                         islandContext.navigation.openAudio()
                     }
                 }
             }
 
-            ControlSlider {
-                Layout.fillWidth: true
-                Layout.minimumWidth: 0
-                label: "Volume"
-                iconSource: AudioService.volumeIcon
-
-                value: AudioService.volume / 100
-
-                onValueChangedByUser: function(value) {
-
-                    AudioService.setVolume(
-                        value * 100
-                    )
-                }
-            }
-
-            ControlSlider {
-                Layout.fillWidth: true
-                Layout.minimumWidth: 0
-                label: "Brightness"
-                commitOnRelease: true
-                enabled: root.displayBrightness?.available ?? false
-                opacity: enabled ? 1 : 0.45
-                iconSource: root.displayBrightness?.brightnessIcon ?? "../assets/icons/brightness-half.svg"
-
-                value: (root.displayBrightness?.brightness ?? 0) / 100
-
-                onValueChangedByUser: function(value) {
-
-                    root.displayBrightness.setBrightness(
-                        value * 100
-                    )
-                }
-            }
-
-            Text {
-                Layout.fillWidth: true
-                visible: text !== ""
-                text: root.displayBrightness?.error ?? ""
-                font.pixelSize: 12
-                wrapMode: Text.Wrap
-                color: Theme.textSecondary
-            }
-
             Rectangle {
-
+                id: notifications
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 140

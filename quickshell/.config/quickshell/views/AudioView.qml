@@ -1,75 +1,21 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import "../components"
 import "../services"
-import "../core"
 import "../styles"
 
-FocusScope {
-    id: root
-    property var islandContext: IslandRegistry.contextFor(parent)
-    required property real availableWidth
-    required property real availableHeight
-    implicitWidth: Math.min(520, availableWidth)
-    implicitHeight: Math.min(layout.implicitHeight + 40, availableHeight)
-    focus: true
-    Component.onCompleted: { forceActiveFocus(); AudioRouting.refresh() }
-    Keys.forwardTo: [escapeKey]
-    EscapeKeyHandler {
-        id: escapeKey
-        onTriggered: root.islandContext.navigation.closeDevicePage()
-    }
+DeviceSettingsPage {
+    title: "Audio"
+    Component.onCompleted: AudioRouting.refresh()
 
-    ColumnLayout {
-        id: layout
-        anchors.fill: parent
-        anchors.margins: 20
-        spacing: 12
-        RowLayout {
-            NotificationButton {
-                text: "‹"
-                Accessible.name: "Back to Control Center"
-                onClicked: root.islandContext.navigation.closeDevicePage()
-            }
-            Text {
-                text: "Audio"
-                Layout.fillWidth: true
-                color: Theme.textPrimary
-                font.pixelSize: 18
-                font.weight: Font.DemiBold
-            }
-            NotificationButton {
-                text: "×"
-                Accessible.name: "Close audio settings"
-                onClicked: root.islandContext.navigation.reset()
-            }
-        }
-        Flickable {
-            id: scroll
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            implicitHeight: sections.implicitHeight
-            contentWidth: width
-            contentHeight: sections.implicitHeight
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ScrollBar {}
-            ColumnLayout {
-                id: sections
-                width: scroll.width
-                spacing: 10
-                DeviceSection { output: true }
-                DeviceSection { output: false }
-                Text {
-                    Layout.fillWidth: true
-                    visible: text !== ""
-                    text: AudioRouting.error || AudioRouting.readError
-                    color: Theme.warning
-                    wrapMode: Text.Wrap
-                }
-            }
-        }
+    DeviceSection { output: true }
+    DeviceSection { output: false }
+    Text {
+        Layout.fillWidth: true
+        visible: text !== ""
+        text: AudioRouting.error || AudioRouting.readError
+        color: Theme.warning
+        wrapMode: Text.Wrap
     }
 
     component DeviceSection: ColumnLayout {
