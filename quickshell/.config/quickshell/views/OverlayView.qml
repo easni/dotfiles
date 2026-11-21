@@ -129,7 +129,7 @@ Item {
                 StatusManager.mode === "volume" ||
                 StatusManager.mode === "brightness"
 
-            text: StatusManager.value >= 0
+            text: StatusManager.mode === "brightness" ? StatusManager.title : StatusManager.value >= 0
                 ? StatusManager.value + "%"
                 : "Muted"
 

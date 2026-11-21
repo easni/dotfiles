@@ -3,9 +3,12 @@ import QtTest
 import Quickshell
 import "../components"
 import "../services"
+import "../core"
 import "../views"
 
 ShellRoot {
+    DisplayBrightness { id: displayBrightness; connector: "DP-2" }
+    DisplayBrightness { id: missingDisplay; connector: "DP-1" }
     FloatingWindow {
         id: window
         visible: true
@@ -61,20 +64,44 @@ ShellRoot {
             slider.forceActiveFocus()
             keyClick(Qt.Key_Right)
             check(Math.abs(canvas.externalValue - 0.2) < 0.001, "Slider keyboard adjustment failed")
+            slider.commitOnRelease = true
+            const initial = canvas.externalValue
+            mousePress(slider, 45, 17)
+            mouseMove(slider, 210, 17)
+            check(canvas.externalValue === initial && slider.displayValue > 0.65, "Brightness drag wrote during preview")
+            mouseRelease(slider, 210, 17)
+            check(Math.abs(canvas.externalValue - 0.7) < 0.01, "Brightness release did not commit")
             slider.visible = false
 
             AudioService.setVolume(25)
             AudioService.setVolume(60)
             AudioService.setVolume(83)
-            BrightnessService.setBrightness(25)
-            BrightnessService.setBrightness(60)
-            BrightnessService.setBrightness(79)
+            displayBrightness.setBrightness(25)
+            displayBrightness.setBrightness(60)
+            displayBrightness.setBrightness(79)
             wait(600)
             AudioService.volume = 0
-            BrightnessService.brightness = 0
+            displayBrightness.brightness = 0
             AudioService.update()
-            BrightnessService.update()
-            until(() => AudioService.volume === 83 && BrightnessService.brightness === 79, "Final slider command was lost")
+            displayBrightness.update()
+            until(() => AudioService.volume === 83 && displayBrightness.brightness === 79, "Final slider command was lost")
+
+            missingDisplay.update()
+            until(() => !missingDisplay.busy && missingDisplay.error !== "", "Missing display was not reported")
+            check(!missingDisplay.available, "Missing display exposed a slider")
+            missingDisplay.connector = "DP-2"
+            missingDisplay.update()
+            until(() => missingDisplay.available && missingDisplay.brightness === 79, "Reconnected display unavailable")
+
+            displayBrightness.step(5)
+            check(StatusManager.visible && StatusManager.value === 84, "Missing immediate key preview")
+            wait(1200)
+            displayBrightness.step(5)
+            check(StatusManager.value === 89, "Second key preview did not accumulate")
+            wait(1200)
+            check(displayBrightness.confirmed === 79 && !displayBrightness.busy, "Key write started early")
+            until(() => displayBrightness.confirmed === 89, "Final key brightness was not applied")
+            check(!StatusManager.visible, "Duplicate key toast")
 
             until(() => WifiService.available && !WifiService.busy, "Wi-Fi unavailable")
             check(WifiService.enabled && !WifiService.connected, "Expected disconnected radio on")

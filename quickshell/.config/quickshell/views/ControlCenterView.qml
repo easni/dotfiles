@@ -13,6 +13,15 @@ Item {
 
     id: root
 
+    readonly property var displayBrightness: islandContext.displayBrightness ?? null
+    onDisplayBrightnessChanged: displayBrightness?.update()
+    Timer {
+        interval: 10000
+        running: !!root.displayBrightness
+        repeat: true
+        onTriggered: root.displayBrightness.update()
+    }
+
     clip: true
     
     property real availableWidth: 520
@@ -180,16 +189,28 @@ Item {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 label: "Brightness"
-                iconSource: BrightnessService.brightnessIcon
+                commitOnRelease: true
+                enabled: root.displayBrightness?.available ?? false
+                opacity: enabled ? 1 : 0.45
+                iconSource: root.displayBrightness?.brightnessIcon ?? "../assets/icons/brightness-half.svg"
 
-                value: BrightnessService.brightness / 100
+                value: (root.displayBrightness?.brightness ?? 0) / 100
 
                 onValueChangedByUser: function(value) {
 
-                    BrightnessService.setBrightness(
+                    root.displayBrightness.setBrightness(
                         value * 100
                     )
                 }
+            }
+
+            Text {
+                Layout.fillWidth: true
+                visible: text !== ""
+                text: root.displayBrightness?.error ?? ""
+                font.pixelSize: 12
+                wrapMode: Text.Wrap
+                color: Theme.textSecondary
             }
 
             Rectangle {

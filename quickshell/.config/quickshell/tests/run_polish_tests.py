@@ -53,16 +53,17 @@ elif name == 'wpctl':
         time.sleep(.1)
         write('volume',args[-1].rstrip('%'))
     else: print('Volume:',int(read('volume','30'))/100)
-elif name == 'brightnessctl':
-    if args[0]=='set':
-        time.sleep(.1)
-        write('brightness',args[-1].rstrip('%'))
-    print('Current brightness: 42 ('+read('brightness','30')+'%)')
+elif name == 'ddcutil':
+    if 'detect' in args: print('Display 1\\n   I2C bus: /dev/i2c-7\\n   DRM connector: card1-DP-2')
+    elif 'setvcp' in args:
+        write('brightness',args[-1])
+        with (root/'levels').open('a') as f: print(args[-1],file=f)
+    else: print('VCP 10 C', read('brightness','30'), 100)
 else:
     with (root/'external').open('a') as f: f.write(name+'\\n')
 ''')
     fixture.chmod(0o755)
-    for name in ('nmcli', 'wpctl', 'brightnessctl', 'awww', 'bluetoothctl', 'hyprctl', 'cava'):
+    for name in ('nmcli', 'wpctl', 'ddcutil', 'awww', 'bluetoothctl', 'hyprctl', 'cava'):
         (bindir / name).symlink_to(fixture)
     env = dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home/'.config'),
                XDG_RUNTIME_DIR=str(runtime), QT_QPA_PLATFORM='offscreen', QT_QUICK_BACKEND='software',
@@ -77,7 +78,9 @@ else:
     print(output)
     assert result.returncode == 0 and 'PASS slider bindings' in output
     assert (work/'volume').read_text() == '83'
-    assert (work/'brightness').read_text() == '79'
+    assert (work/'brightness').read_text() == '89'
+    levels = (work/'levels').read_text().splitlines()
+    assert levels[levels.index('79')+1:] == ['89'], levels
     # Explicit theme sync must preserve terminal settings and emit colors only.
     kitty = home/'.config/kitty'
     kitty.mkdir(parents=True, exist_ok=True)

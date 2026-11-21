@@ -1,10 +1,7 @@
 #!/bin/bash
-
-brightnessctl set "$1"
-
-BRIGHTNESS=$(brightnessctl info | grep -oP '\(\K[^%]+(?=%\))')
-
-CACHE_DIR="$HOME/.cache/quickshell/status"
-mkdir -p "$CACHE_DIR"
-
-printf "brightness|%s\n" "$BRIGHTNESS" > "$CACHE_DIR/event"
+case "$1" in
+    +[0-9]*%) exec qs ipc call luci brightnessStep "${1:1:-1}" ;;
+    [0-9]*%-) exec qs ipc call luci brightnessStep "-${1%\%-}" ;;
+    [0-9]*%) exec qs ipc call luci brightnessSet "${1%\%}" ;;
+esac
+exit 1

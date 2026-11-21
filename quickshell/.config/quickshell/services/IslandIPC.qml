@@ -7,6 +7,8 @@ Scope {
     property var targetSession: IslandRegistry.target
     IpcHandler {
         target: "luci"
+        function brightnessStep(amount: int) { root.targetSession?.displayBrightness.step(amount) }
+        function brightnessSet(percent: int) { root.targetSession?.displayBrightness.setBrightness(percent) }
         function openBluetooth() { IslandRegistry.dispatch("openBluetooth", root.targetSession) }
         function openAppLauncher() { IslandRegistry.dispatch("openAppLauncher", root.targetSession) }
         function openClipboard() { IslandRegistry.dispatch("openClipboard", root.targetSession) }
