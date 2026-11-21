@@ -10,6 +10,10 @@ Rectangle {
 
     property real availableWidth: 420
     property real availableHeight: 480
+    property alias contentVisible: viewHost.visible
+    property bool edgeHovered: false
+    readonly property bool pointerOverIsland: islandHover.hovered || edgeHovered
+    onPointerOverIslandChanged: islandInteraction.handleHoverChanged(pointerOverIsland)
 
     clip: true
 
@@ -42,7 +46,6 @@ Rectangle {
 
         onHoveredChanged: {
             islandContext.notifications.hovered = hovered && islandContext.notifications.visible
-            islandInteraction.handleHoverChanged(hovered)
         }
     }
 

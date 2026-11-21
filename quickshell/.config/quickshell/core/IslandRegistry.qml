@@ -17,6 +17,14 @@ Singleton {
         launcher: LauncherController, notifications: NotificationController})
     readonly property var pausedIds: sessions.map(s => s.notifications.pausedId).filter(id => id >= 0)
 
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event.name === "fullscreen") Hyprland.refreshToplevels()
+            if (event.name === "activespecialv2") Hyprland.refreshMonitors()
+        }
+    }
+
     function contextFor(item) {
         for (let node = item; node; node = node.parent) {
             if (node.islandContext !== undefined) return node.islandContext
